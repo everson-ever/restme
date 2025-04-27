@@ -1,0 +1,13 @@
+services:
+  restme_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restme
+    command: /bin/bash
+    tty: true
+    volumes:
+      - .:/var/www/restme
+    mem_limit: 1024mb
+volumes:
+  app:
