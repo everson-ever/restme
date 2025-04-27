@@ -124,6 +124,37 @@ end
 ```
 
 
+### app/restfy/products_controller/scope/rules.rb
+This rule defines which records are part of the current user's scope (i.e., visible to them).
+```ruby
+module ProductsController::Scope
+  class Rules
+
+    # The initialization of the scope rules must receive the following three parameters: current_record (the record in memory), current_user, and the controller's params.
+    def initialize(klass, current_user, controller_params = {})
+      @klass = klass
+      @current_user = current_user
+      @controller_params = controller_params
+    end
+
+    def client_scope
+      @klass.all
+    end
+
+    def deliveryman_scope
+      @klass.all
+    end
+
+    def manager_scope
+      @klass.where(establishment_id: @current_user.manager.establishments.ids)
+    end
+  end
+end
+
+
+```
+
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
