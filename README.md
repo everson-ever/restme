@@ -124,6 +124,30 @@ end
 ```
 
 
+### app/restfy/products_controller/update/rules.rb
+- Used to check if the current update action is within the user's scope. The example below checks if a manager is authorized to update a product for a specific establishment_id.
+- `UPDATABLE_ACTIONS_RULES` defines which controller actions are considered PUT actions.
+```ruby
+module ProductsController::Update
+  class Rules
+    UPDATABLE_ACTIONS_RULES = %i[update].freeze
+
+    # The initialization of the create rules must receive the following three parameters: current_record (the record in memory), current_user, and the controller's params.
+    def initialize(temp_record, current_user, controller_params = {})
+      @temp_record = temp_record
+      @current_user = current_user
+      @controller_params = controller_params
+    end
+
+    def update_manager_scope?
+      @current_user.manager.establishments.select(:id).ids.include?(@temp_record.establishment_id)
+    end
+  end
+end
+
+```
+
+
 ### app/restfy/products_controller/scope/rules.rb
 This rule defines which records are part of the current user's scope (i.e., visible to them).
 ```ruby
@@ -150,8 +174,27 @@ module ProductsController::Scope
     end
   end
 end
+```
 
 
+### app/restfy/products_controller/field/rules.rb
+This rule defines which nested_fields are selectable (nested fields are model relationships).
+```ruby
+module ProductsController::Field
+  class Rules
+    NESTED_SELECTABLE_FIELDS = {
+      unit: {
+        table_name: :units
+      },
+      establishment: {
+        table_name: :establishments
+      },
+      category: {
+        table_name: :categories
+      }
+    }.freeze
+  end
+end
 ```
 
 
