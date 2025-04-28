@@ -288,6 +288,8 @@ Example:
 http://localhost:3000/api/v1/products?fields_select=id,name
 ```
 
+<br><br>
+
 
 #### Nested Field Selection (`nested_fields_select`)
 
