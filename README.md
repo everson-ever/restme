@@ -199,7 +199,9 @@ end
 
 ### And now how to use that?
 
-#### Filtering Data
+<br><br>
+
+#### Filtering
 
 To enable data filtering, specify the filterable fields in your model using the `FILTERABLE_FIELDS` constant (e.g., `FILTERABLE_FIELDS = %[name]`).
 
@@ -235,7 +237,7 @@ http://127.0.0.1/api/v1/products?name_equal=foo,establishment_id_in=1,2,3
 <br><br>
 
 
-#### Sorting Data
+#### Sorting
 
 To enable data sorting, specify the sortable fields in your model using the `SORTABLE_FIELDS` constant (e.g., `SORTABLE_FIELDS = %[id]`).
 
@@ -252,6 +254,90 @@ Examples
   ```bash
    http://localhost:3000/api/v1/products?id_sort=asc
   ```
+
+<br><br>
+
+
+#### Pagination
+
+Pagination functionality is available for any `index` endpoint that uses the `pagination_response` variable in the controller.
+
+There are two query parameters available to control pagination:
+- `per_page`: Defines the number of items per page.
+- `page`: Sets the current page number.
+
+ℹ️ **Note:** The maximum number of items per page is currently limited to 100.
+
+Example usage:
+
+```bash
+http://localhost:3000/api/v1/products?per_page=12&page=1
+```
+
+<br><br>
+
+
+#### Field Selection (`fields_select`)
+
+You can select specific fields from your model, such as `id`, `name`, or `created_at`.  
+The resulting query will retrieve **only** the selected fields directly from the database, improving performance.
+
+Example:
+
+```bash
+http://localhost:3000/api/v1/products?fields_select=id,name
+```
+
+
+#### Nested Field Selection (`nested_fields_select`)
+
+You can also select specific relationships of your records, such as `product.client` or `product.establishment`.  
+The resulting query will automatically include the related data, optimizing the response for your needs.
+
+ℹ️ **Note:**  
+If you select a nested field, you must also ensure that the related foreign key (e.g., `establishment_id`, `client_id`) is included via `fields_select`.  
+If the `fields_select` parameter is not provided, Restme will automatically handle the necessary field selections.
+
+Example:
+
+```bash
+http://localhost:3000/api/v1/products?nested_fields_select=client
+```
+
+```json
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "foo",
+      "client": {
+        "id": 5,
+        "name": "bar"
+      }
+    }
+  ]
+}
+```
+
+<br><br>
+
+
+#### Attachment Field Selection (`attachment_fields_select`)
+
+If your model uses Active Storage and has attachments, you can retrieve the URL of an attached file by using the `attachment_fields_select` parameter.  
+When specified, Restme will include the URL of the attachment in the response.
+
+ℹ️ **Note:**  
+If the specified attachment field does not exist in the model, Restme will return an HTTP 422 Unprocessable Entity error.
+
+Example:
+
+```bash
+http://localhost:3000/api/v1/products?attachment_fields_select=image
+```
+
+<br><br>
+
 
 ## License
 
