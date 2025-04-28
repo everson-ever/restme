@@ -197,6 +197,43 @@ module ProductsController::Field
 end
 ```
 
+### And now how to use that?
+
+#### Filtering Data
+
+To enable data filtering, specify the filterable fields in your model using the `FILTERABLE_FIELDS` constant (e.g., `FILTERABLE_FIELDS = %[name]`).
+
+You can filter data using the following query parameters:
+
+- **in**: Filters by matching any of the specified values.
+  - Example: `id_in=1,2,3`
+  
+- **equal**: Filters by exact match.
+  - Example: `name_equal=foo`
+  
+- **like**: Filters by partial match (using `LIKE` SQL operator).
+  - Example: `name_like=foo`
+  
+- **bigger_than**: Filters by records where the field is greater than the specified value.
+  - Example: `created_at_bigger_than=2025-01-01`
+  
+- **less_than**: Filters by records where the field is less than the specified value.
+  - Example: `created_at_less_than=2025-01-01`
+  
+- **bigger_than_or_equal_to**: Filters by records where the field is greater than or equal to the specified value.
+  - Example: `created_at_bigger_than_or_equal_to=2025-01-01`
+  
+- **less_than_or_equal_to**: Filters by records where the field is less than or equal to the specified value.
+  - Example: `created_at_less_than_or_equal_to=2025-01-01`
+
+Example request:
+
+
+
+```
+http://127.0.0.1/api/v1/products?name_equal=foo,establishment_id_in=1,2,3
+```
+
 
 ## License
 
