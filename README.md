@@ -7,7 +7,7 @@
 Adds support for new controller actions such as pagination, filtering, sorting, and selecting specific model fields. Easily implement full CRUD functionality by importing Restme into your controller.
 
 This gem manages your controller's responsibilities for:
-- Read Actions: Providing complete pagination, filtering, sorting, and field selection for records.
+- Read Actions: Provide complete pagination, filtering, sorting, and field selection for records, all handled through query parameters (e.g., `http://127.0.0.1/products?name_equal=foo`).
 - Create/Update Actions: Enabling automatic creation and updating of records.
 
 ## Installation
