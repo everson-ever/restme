@@ -228,12 +228,30 @@ You can filter data using the following query parameters:
 
 Example request:
 
-
-
 ```
 http://127.0.0.1/api/v1/products?name_equal=foo,establishment_id_in=1,2,3
 ```
 
+<br><br>
+
+
+#### Sorting Data
+
+To enable data sorting, specify the sortable fields in your model using the `SORTABLE_FIELDS` constant (e.g., `SORTABLE_FIELDS = %[id]`).
+
+You can sort records using the following query parameters:
+
+Examples
+
+- **Descending (DESC)**: Sort records in descending order.
+  ```bash
+   http://localhost:3000/api/v1/products?id_sort=desc
+  ```
+
+- Ascending (ASC): Sort records in ascending order.
+  ```bash
+   http://localhost:3000/api/v1/products?id_sort=asc
+  ```
 
 ## License
 
