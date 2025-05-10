@@ -3,6 +3,7 @@
 module Restme
   module Scope
     module Paginate
+      # Defines pagination rules
       module Rules
         DEFAULT_PER_PAGE = ENV.fetch("PAGINATION_DEFAULT_PER_PAGE", 12)
         DEFAULT_PAGE = ENV.fetch("PAGINATION_DEFAULT_PAGE", 1)

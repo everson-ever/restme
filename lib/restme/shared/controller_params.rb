@@ -2,6 +2,7 @@
 
 module Restme
   module Shared
+    # Returns both the query string parameters and the request body parameters received by the controller.
     module ControllerParams
       def controller_params
         params_filtered.permit!.to_h.values.first.deep_symbolize_keys

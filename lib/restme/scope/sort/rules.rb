@@ -3,6 +3,7 @@
 module Restme
   module Scope
     module Sort
+      # Defines the rules used to sort the records.
       module Rules
         ID = :id
         SORT_KEY = "sort"

@@ -6,6 +6,7 @@ require_relative "../shared/controller_params"
 
 module Restme
   module Create
+    # Defines create restrictions rules for a record.
     module Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel

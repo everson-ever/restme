@@ -10,6 +10,9 @@ require_relative "field/rules"
 
 module Restme
   module Scope
+    # Defines the user scope when viewing records.
+    # It can apply pagination, field selection, sorting, and filtering.
+    # Returns records based on the user's contextual rules.
     module Rules
       include ::Restme::Scope::Field::Rules
       include ::Restme::Scope::Paginate::Rules

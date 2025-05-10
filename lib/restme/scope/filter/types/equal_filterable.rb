@@ -3,6 +3,7 @@
 module Scope
   module Filter
     module Types
+      # Defines the behavior of the "equal" filter in queries.
       module EqualFilterable
         FIELD_SUFFIX = :equal
 

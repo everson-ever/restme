@@ -3,6 +3,7 @@
 module Scope
   module Filter
     module Types
+      # Defines the behavior of the "less than" filter in queries.
       module LessThanFilterable
         FIELD_SUFFIX = :less_than
 

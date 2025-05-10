@@ -3,6 +3,7 @@
 module Scope
   module Filter
     module Types
+      # Defines the behavior of the "bigger than" filter in queries.
       module BiggerThanFilterable
         FIELD_SUFFIX = :bigger_than
 

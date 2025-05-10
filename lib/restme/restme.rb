@@ -6,6 +6,7 @@ require_relative "create/rules"
 require_relative "update/rules"
 
 module Restme
+  # Defines the initialization rules for Restme.
   module Restme
     include ::Restme::Update::Rules
     include ::Restme::Create::Rules

@@ -5,6 +5,7 @@ require_relative "../shared/current_model"
 
 module Restme
   module Authorize
+    # Defines the rules used to authotize user
     module Rules
       include ::Restme::Shared::CurrentModel
       include ::Restme::Shared::UserRole

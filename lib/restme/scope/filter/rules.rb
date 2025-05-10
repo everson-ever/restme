@@ -11,6 +11,7 @@ require_relative "types/in_filterable"
 module Restme
   module Scope
     module Filter
+      # Defines filter rules
       module Rules
         include ::Scope::Filter::Types::InFilterable
         include ::Scope::Filter::Types::LessThanOrEqualToFilterable

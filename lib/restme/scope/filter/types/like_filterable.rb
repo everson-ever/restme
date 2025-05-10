@@ -3,6 +3,7 @@
 module Scope
   module Filter
     module Types
+      # Defines the behavior of "like" filters used for partial matching in queries.
       module LikeFilterable
         FIELD_SUFFIX = :like
 

@@ -3,6 +3,7 @@
 module Restme
   module Scope
     module Field
+      # Defines the rules that determine which attachable fields can be attached.
       module Attachable
         def insert_attachments(scope)
           unallowed_attachment_fields_error

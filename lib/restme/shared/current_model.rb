@@ -2,6 +2,8 @@
 
 module Restme
   module Shared
+    # Returns the model associated with the controller.
+    # It tries to determine the model dynamically or uses the MODEL_NAME constant if defined in the controller.
     module CurrentModel
       def klass
         return defined_model_name if defined_model_name
