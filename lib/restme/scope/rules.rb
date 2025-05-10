@@ -77,7 +77,7 @@ module Restme
       end
 
       def super_admin_scope
-        klass.all if current_user.super_admin?
+        klass.all if restme_current_user&.super_admin? || restme_current_user.blank?
       end
 
       def none_scope
@@ -90,7 +90,7 @@ module Restme
 
       def scope_rules_class
         "#{controller_class.to_s.split("::").last}::Scope::Rules"
-          .constantize.new(klass, current_user, params)
+          .constantize.new(klass, restme_current_user, params)
       end
     end
   end

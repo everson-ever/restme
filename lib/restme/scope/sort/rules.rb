@@ -8,10 +8,9 @@ module Restme
         SORT_KEY = "sort"
         SORTABLE_TYPES = %w[asc desc].freeze
 
-        # before_action :unknown_sortable_fields_response, if: :unknown_sortable_fields?
-
         def sortable_scope(user_scope)
           return user_scope unless sortable_scope?
+          return user_scope if unknown_sortable_fields_errors
 
           user_scope.order(serialize_sort_params)
         end
@@ -41,13 +40,19 @@ module Restme
             serialize_sort_params.map { |sort_param| sort_param.first.first } - sortable_fields
         end
 
-        def unknown_sortable_fields?
-          unknown_sortable_fields.present?
-        end
+        def unknown_sortable_fields_errors
+          return unless unknown_sortable_fields.present?
 
-        def unknown_sortable_fields_response
-          render json: { message: "Unknown Sort", body: unknown_sortable_fields },
-                 status: :bad_request
+          restme_scope_errors(
+            {
+              message: "Unknown Sort",
+              body: unknown_sortable_fields
+            }
+          )
+
+          restme_scope_status(:bad_request)
+
+          true
         end
 
         def sortable_fields

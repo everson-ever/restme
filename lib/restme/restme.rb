@@ -12,10 +12,18 @@ module Restme
     include ::Restme::Scope::Rules
     include ::Restme::Authorize::Rules
 
-    private
+    attr_reader :restme_current_user
 
     def initialize_restme
+      use_current_user
+
       user_authorize
+    end
+
+    private
+
+    def use_current_user
+      @restme_current_user = try(:current_user)
     end
   end
 end

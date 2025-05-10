@@ -4,7 +4,7 @@ module Restme
   module Shared
     module UserRole
       def user_role
-        current_user.role
+        restme_current_user&.role
       end
     end
   end

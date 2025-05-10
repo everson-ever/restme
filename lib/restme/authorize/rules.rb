@@ -10,6 +10,7 @@ module Restme
       include ::Restme::Shared::UserRole
 
       def user_authorize
+        return true unless restme_current_user
         return if super_authorize? || allowed_roles_actions[action_name.to_sym]&.include?(user_role.to_sym)
 
         render json: { message: "Action not allowed" }, status: :forbidden
@@ -22,7 +23,7 @@ module Restme
       end
 
       def super_authorize?
-        current_user.super_admin?
+        restme_current_user&.super_admin?
       end
 
       def authorize_rules_class
