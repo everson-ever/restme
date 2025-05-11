@@ -28,7 +28,7 @@ gem 'restme', '~> 0.0.33'
 
 #### ℹ️ Current Version of gem require the following pré configs
 
- - Your models must include a current_user attribute (model.current_user). This attribute is used during create and update actions to set the user context at runtime, allowing it to be used in custom logic
+ - If your controller defines an instance variable named `current_user`, Restme will automatically assign it to `model.current_user` during create and update actions—provided your model responds to the `current_user` method.
  - Your user model must have a role attribute (user.role).
  - Your controllers must be named using the plural form of the model (e.g., Product → ProductsController). Alternatively, you can manually set the model name by defining the MODEL_NAME constant (e.g., MODEL_NAME = "Shopping").
  - You must create a folder inside app named restfy to define controller rules for authorization, scoping, creation, updating, and field selection (see example below).
