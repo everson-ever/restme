@@ -34,6 +34,7 @@ gem 'restme', '~> 0.0.37'
 
 ### Usage examples
 
+Rails API project example here: https://github.com/everson-ever/restme-example/pull/1
 
 #### First of all
 
