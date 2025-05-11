@@ -10,7 +10,7 @@ module Restme
         MAX_PER_PAGE = ENV.fetch("PAGINATION_MAX_PER_PAGE", 100)
 
         def paginable_scope(user_scope)
-          per_page_error
+          return user_scope if per_page_error
 
           user_scope.limit(per_page).offset(paginate_offset)
         end
@@ -46,6 +46,8 @@ module Restme
           )
 
           restme_scope_status(:bad_request)
+
+          true
         end
       end
     end

@@ -23,14 +23,21 @@ module Restme
 
         ID = :id
 
-        FILTERS_TYPES = %i[equal like bigger_than less_than
-                           bigger_than_or_equal_to less_than_or_equal_to in].freeze
+        FILTERS_TYPES = %i[
+          equal
+          like
+          bigger_than
+          less_than
+          bigger_than_or_equal_to
+          less_than_or_equal_to
+          in
+        ].freeze
 
         private
 
         def filterable_scope(user_scope)
-          return unallowed_filter_fields_response if unallowed_fields_to_filter?
           return user_scope unless filterable_scope?
+          return user_scope if unallowed_filter_fields_errors
 
           next_scope = where_equal(user_scope)
           next_scope = where_like(next_scope)
@@ -66,18 +73,10 @@ module Restme
           [ID]
         end
 
-        def unallowed_fields_to_filter?
+        def filterable_scope?
           try_insert_id_equal
 
-          filterable_scope? && unallowed_fields_to_filter.present?
-        end
-
-        def filterable_scope?
           request.get? && controller_params_filters_fields.present?
-        end
-
-        def unallowed_fields_to_filter
-          @unallowed_fields_to_filter ||= controller_params_filters_fields - allowed_fields
         end
 
         def try_insert_id_equal
@@ -86,9 +85,23 @@ module Restme
           controller_params_filters_fields.push(:id_equal)
         end
 
-        def unallowed_filter_fields_response
-          render json: { message: "Unknown Filter Fields", body: unallowed_fields_to_filter },
-                 status: :bad_request
+        def unallowed_filter_fields_errors
+          return unless unallowed_fields_to_filter.present?
+
+          restme_scope_errors(
+            {
+              message: "Unknown Filter Fields",
+              body: unallowed_fields_to_filter
+            }
+          )
+
+          restme_scope_status(:bad_request)
+
+          true
+        end
+
+        def unallowed_fields_to_filter
+          @unallowed_fields_to_filter ||= controller_params_filters_fields - allowed_fields
         end
 
         def controller_params_filters_fields
