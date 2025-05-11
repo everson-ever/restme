@@ -1,7 +1,5 @@
 # Restme
 
-## ⚠️ Do not use this gem yet. In progress
-
 [![Gem Version](https://badge.fury.io/rb/restme.svg)](https://badge.fury.io/rb/restme)
 
 Adds support for new **Rails** controller actions such as pagination, filtering, sorting, and selecting specific model fields. Easily implement full CRUD functionality by importing Restme into your controller.
@@ -21,7 +19,7 @@ gem install restme
 OR
 
 ```bash
-gem 'restme', '~> 0.0.33'
+gem 'restme', '~> 0.0.37'
 ```
 
 ## Usage
