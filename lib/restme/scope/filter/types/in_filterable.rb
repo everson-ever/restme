@@ -3,6 +3,7 @@
 module Scope
   module Filter
     module Types
+      # Defines the behavior of the "in" filter in queries.
       module InFilterable
         FIELD_SUFFIX = :in
 

@@ -5,6 +5,7 @@ require_relative "attachable"
 module Restme
   module Scope
     module Field
+      # Defines the rules that determine which fields can be attached.
       module Rules
         include Restme::Scope::Field::Attachable
 

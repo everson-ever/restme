@@ -6,6 +6,7 @@ require_relative "../shared/controller_params"
 
 module Restme
   module Update
+    # Defines update restrictions rules for a record.
     module Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel
@@ -18,11 +19,20 @@ module Restme
       def updateable_record
         @updateable_record ||= begin
           @update_temp_record = klass.find_by(id: params[:id])
-          update_temp_record.current_user = current_user
+
+          set_update_temp_record_current_user
+
           update_temp_record.assign_attributes(controller_params)
 
           update_record_errors.presence || update_temp_record
         end
+      end
+
+      def set_update_temp_record_current_user
+        return unless update_temp_record.respond_to?(:current_user)
+        return unless restme_current_user
+
+        update_temp_record.current_user = restme_current_user
       end
 
       def restme_update_status
@@ -68,7 +78,7 @@ module Restme
       end
 
       def updateable_super_admin_scope?
-        current_user.super_admin?
+        restme_current_user&.super_admin?
       end
 
       def updateable_record_errors_messages
@@ -95,7 +105,7 @@ module Restme
 
       def update_rules_class
         @update_rules_class ||= "#{controller_class.to_s.split("::").last}::Update::Rules"
-                                .constantize.new(update_temp_record, current_user, controller_params)
+                                .constantize.new(update_temp_record, restme_current_user, controller_params)
       end
     end
   end

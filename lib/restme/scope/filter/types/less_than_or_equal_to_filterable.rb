@@ -3,6 +3,7 @@
 module Scope
   module Filter
     module Types
+      # Defines the behavior of the "less than or equal to" filter in queries.
       module LessThanOrEqualToFilterable
         FIELD_SUFFIX = :less_than_or_equal_to
 
