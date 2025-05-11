@@ -72,6 +72,8 @@ module Restme
       end
 
       def updateable_scope?
+        return true unless restme_current_user
+
         method_scope = "#{updateable_current_action}_#{user_role}_scope?"
 
         updateable_super_admin_scope? || update_rules_class.try(method_scope) || false
@@ -90,6 +92,8 @@ module Restme
       end
 
       def updateable_current_action
+        return true unless restme_current_user
+
         current_action.presence_in update_rules_class.class::UPDATABLE_ACTIONS_RULES
       rescue StandardError
         nil

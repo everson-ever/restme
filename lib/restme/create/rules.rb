@@ -82,6 +82,8 @@ module Restme
       end
 
       def creatable_current_action
+        return true unless restme_current_user
+
         current_action.presence_in create_rules_class.class::CREATABLE_ACTIONS_RULES
       rescue StandardError
         nil
