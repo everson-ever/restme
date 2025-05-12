@@ -19,7 +19,7 @@ gem install restme
 OR
 
 ```bash
-gem 'restme', '~> 0.0.37'
+gem 'restme'
 ```
 
 ## Usage
