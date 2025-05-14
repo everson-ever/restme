@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "activerecord"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "database_cleaner-active_record"
+  spec.add_development_dependency "dotenv"
   spec.add_development_dependency "pg"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "timecop"

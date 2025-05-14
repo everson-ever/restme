@@ -56,6 +56,7 @@ GEM
     database_cleaner-core (2.0.1)
     date (3.4.1)
     diff-lcs (1.6.2)
+    dotenv (3.1.8)
     drb (2.2.1)
     erubi (1.13.1)
     i18n (1.14.7)
@@ -203,6 +204,7 @@ DEPENDENCIES
   activerecord
   byebug
   database_cleaner-active_record
+  dotenv
   pg
   rake (~> 13.0)
   restme!

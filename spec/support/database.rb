@@ -9,7 +9,7 @@ db_config = {
   database: "restme",
   username: "postgres",
   password: "postgres",
-  host: "localhost",
+  host: ENV.fetch("DATABASE_HOST", "localhost"),
   port: 5432
 }
 
