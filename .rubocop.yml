@@ -12,4 +12,3 @@ Style/StringLiteralsInInterpolation:
 Metrics/BlockLength:
   Exclude:
     - spec/lib/restme_controller_spec.rb
-    - restme.gemspec
