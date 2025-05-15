@@ -27,100 +27,100 @@ RSpec.describe "RestmeController", type: :controller do
 
   let(:establishment) { Establishment.create(name: "Foo") }
 
-  describe "index (list many)" do
-    describe "authorize rules" do
-      context "when controller have current_user" do
-        context "when authorize rules class exists" do
-          context "when user can access controller action" do
-            context "when is super_admin" do
-              let(:user_role) { :super_admin }
-
-              let(:expected_result) do
-                { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
-              end
-
-              it "rreturns success response" do
-                expect(products_controller.index[:body]).to eq(expected_result)
-              end
-
-              it "returns success status" do
-                expect(products_controller.index[:status]).to eq(:ok)
-              end
-            end
-
-            context "when is other authorized user" do
-              let(:expected_result) do
-                { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
-              end
-
-              it "returns success response" do
-                expect(products_controller.index[:body]).to eq(expected_result)
-              end
-
-              it "returns success status" do
-                expect(products_controller.index[:status]).to eq(:ok)
-              end
-            end
-          end
-
-          context "when user can not access controller action" do
-            let(:user_role) { :other_role }
+  describe "authorize rules" do
+    context "when controller have current_user" do
+      context "when authorize rules class exists" do
+        context "when user can access controller action" do
+          context "when is super_admin" do
+            let(:user_role) { :super_admin }
 
             let(:expected_result) do
-              { body: {}, message: "Action not allowed" }.as_json
+              { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
             end
 
-            it "returns forbidden response" do
+            it "rreturns success response" do
               expect(products_controller.index[:body]).to eq(expected_result)
             end
 
-            it "returns forbidden status" do
-              expect(products_controller.index[:status]).to eq(:forbidden)
+            it "returns success status" do
+              expect(products_controller.index[:status]).to eq(:ok)
+            end
+          end
+
+          context "when is other authorized user" do
+            let(:expected_result) do
+              { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+            end
+
+            it "returns success response" do
+              expect(products_controller.index[:body]).to eq(expected_result)
+            end
+
+            it "returns success status" do
+              expect(products_controller.index[:status]).to eq(:ok)
             end
           end
         end
 
-        context "when authorize rules class does not exists" do
-          context "when authorize rules does not exists" do
-            ## TODO: Add support to authorize rules return json error
+        context "when user can not access controller action" do
+          let(:user_role) { :other_role }
+
+          let(:expected_result) do
+            { body: {}, message: "Action not allowed" }.as_json
+          end
+
+          it "returns forbidden response" do
+            expect(products_controller.index[:body]).to eq(expected_result)
+          end
+
+          it "returns forbidden status" do
+            expect(products_controller.index[:status]).to eq(:forbidden)
           end
         end
       end
 
-      context "when controller does not have current_user" do
-        let(:current_user) { nil }
-
-        context "when is super_admin" do
-          let(:expected_result) do
-            { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }
-          end
-
-          it "returns success response" do
-            expect(products_controller.index[:body]).to eq(expected_result.as_json)
-          end
-
-          it "returns success status" do
-            expect(products_controller.index[:status]).to eq(:ok)
-          end
-        end
-
-        context "when is other role" do
-          let(:expected_result) do
-            { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }
-          end
-
-          it "returns success response" do
-            expect(products_controller.index[:body]).to eq(expected_result.as_json)
-          end
-
-          it "returns success status" do
-            expect(products_controller.index[:status]).to eq(:ok)
-          end
+      context "when authorize rules class does not exists" do
+        context "when authorize rules does not exists" do
+          ## TODO: Add support to authorize rules return json error
         end
       end
     end
 
-    describe "scope rules" do
+    context "when controller does not have current_user" do
+      let(:current_user) { nil }
+
+      context "when is super_admin" do
+        let(:expected_result) do
+          { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }
+        end
+
+        it "returns success response" do
+          expect(products_controller.index[:body]).to eq(expected_result.as_json)
+        end
+
+        it "returns success status" do
+          expect(products_controller.index[:status]).to eq(:ok)
+        end
+      end
+
+      context "when is other role" do
+        let(:expected_result) do
+          { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }
+        end
+
+        it "returns success response" do
+          expect(products_controller.index[:body]).to eq(expected_result.as_json)
+        end
+
+        it "returns success status" do
+          expect(products_controller.index[:status]).to eq(:ok)
+        end
+      end
+    end
+  end
+
+  describe "scope rules" do
+    describe "index (list many)" do
       before do
         Timecop.freeze(2025, 5, 12)
 
