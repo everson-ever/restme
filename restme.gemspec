@@ -36,12 +36,5 @@ Gem::Specification.new do |spec|
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
-  spec.add_development_dependency "actionpack"
-  spec.add_development_dependency "activerecord"
-  spec.add_development_dependency "byebug"
-  spec.add_development_dependency "database_cleaner-active_record"
-  spec.add_development_dependency "dotenv"
-  spec.add_development_dependency "pg"
-  spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "timecop"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end
