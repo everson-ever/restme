@@ -1,8 +1,14 @@
 AllCops:
   TargetRubyVersion: 3.0
+  SuggestExtensions: false
+  NewCops: enable
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/lib/restme_controller_spec.rb
