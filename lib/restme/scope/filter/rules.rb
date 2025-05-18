@@ -36,16 +36,25 @@ module Restme
         private
 
         def filterable_scope(user_scope)
+          @user_scope = user_scope
+
           return user_scope unless filterable_scope?
           return user_scope if unallowed_filter_fields_errors
+          return user_scope if record_not_found_errors
 
-          next_scope = where_equal(user_scope)
-          next_scope = where_like(next_scope)
-          next_scope = where_bigger_than(next_scope)
-          next_scope = where_less_than(next_scope)
-          next_scope = where_bigger_than_or_equal_to(next_scope)
-          next_scope = where_less_than_or_equal_to(next_scope)
-          where_in(next_scope)
+          processed_scope
+        end
+
+        def processed_scope
+          @processed_scope ||= begin
+            next_scope = where_equal(@user_scope)
+            next_scope = where_like(next_scope)
+            next_scope = where_bigger_than(next_scope)
+            next_scope = where_less_than(next_scope)
+            next_scope = where_bigger_than_or_equal_to(next_scope)
+            next_scope = where_less_than_or_equal_to(next_scope)
+            where_in(next_scope)
+          end
         end
 
         def allowed_fields
@@ -96,6 +105,16 @@ module Restme
           )
 
           restme_scope_status(:bad_request)
+
+          true
+        end
+
+        def record_not_found_errors
+          return if params[:id].blank? || processed_scope.exists?
+
+          restme_scope_errors({ body: { id: params[:id] }, message: "Record not found" })
+
+          restme_scope_status(:not_found)
 
           true
         end

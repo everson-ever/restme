@@ -1151,5 +1151,196 @@ RSpec.describe "RestmeController", type: :controller do
         end
       end
     end
+
+    describe "show (list one)" do
+      before do
+        Timecop.freeze(2025, 5, 12)
+
+        product_a
+        product_b
+      end
+
+      after do
+        Timecop.return
+      end
+
+      context "when get product without any params" do
+        let(:controller_params) do
+          {
+            id: product_a.id
+          }
+        end
+
+        let(:expected_result) do
+          {
+            id: product_a.id,
+            name: "Bar",
+            code: "ABC",
+            establishment_id: establishment.id,
+            created_at: "2025-05-12T00:00:00.000Z",
+            updated_at: "2025-05-12T00:00:00.000Z"
+          }.as_json
+        end
+
+        it "returns products" do
+          expect(products_controller.show[:body]).to eq(expected_result)
+        end
+
+        it "returns ok status" do
+          expect(products_controller.show[:status]).to eq(:ok)
+        end
+      end
+
+      context "with field selections" do
+        context "with fields_select" do
+          context "when passed fields are allowed to select" do
+            let(:controller_params) do
+              {
+                id: product_a.id
+              }
+            end
+
+            let(:query_parameters) do
+              {
+                fields_select: "id,name"
+              }
+            end
+
+            let(:expected_result) do
+              {
+                id: product_a.id,
+                name: "Bar"
+              }.as_json
+            end
+
+            it "returns products" do
+              expect(products_controller.show[:body]).to eq(expected_result)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.show[:status]).to eq(:ok)
+            end
+          end
+
+          context "when have fields not allowed to select" do
+            let(:controller_params) do
+              {
+                id: product_a.id
+              }
+            end
+
+            let(:query_parameters) do
+              {
+                fields_select: "id,invalid_field"
+              }
+            end
+
+            let(:expected_result) do
+              { body: ["invalid_field"], message: "Selected not allowed fields" }
+            end
+
+            it "returns products" do
+              expect(products_controller.show[:body]).to eq(expected_result.as_json)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.show[:status]).to eq(:bad_request)
+            end
+          end
+        end
+
+        context "with _nested_fields_select" do
+          context "when passed fields are allowed to select" do
+            let(:controller_params) do
+              {
+                id: product_a.id
+              }
+            end
+
+            let(:query_parameters) do
+              {
+                nested_fields_select: "establishment"
+              }
+            end
+
+            let(:expected_result) do
+              {
+                id: product_a.id,
+                name: "Bar",
+                code: "ABC",
+                establishment_id: establishment.id,
+                created_at: "2025-05-12T00:00:00.000Z",
+                updated_at: "2025-05-12T00:00:00.000Z",
+                establishment: {
+                  id: establishment.id,
+                  name: "Foo",
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z"
+                }
+              }.as_json
+            end
+
+            it "returns products" do
+              expect(products_controller.show[:body]).to eq(expected_result)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.show[:status]).to eq(:ok)
+            end
+          end
+
+          context "when have nested_fields not allowed to select" do
+            let(:controller_params) do
+              {
+                id: product_a.id
+              }
+            end
+
+            let(:query_parameters) do
+              {
+                nested_fields_select: "user"
+              }
+            end
+
+            let(:expected_result) do
+              { body: ["user"], message: "Selected not allowed fields" }
+            end
+
+            it "returns products" do
+              expect(products_controller.show[:body]).to eq(expected_result.as_json)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.show[:status]).to eq(:bad_request)
+            end
+          end
+        end
+      end
+
+      context "when product id does not exists" do
+        let(:controller_params) do
+          {
+            id: 10_000
+          }
+        end
+
+        let(:expected_result) do
+          {
+            body: {
+              id: 10_000
+            },
+            message: "Record not found"
+          }.as_json
+        end
+
+        it "returns products" do
+          expect(products_controller.show[:body]).to eq(expected_result)
+        end
+
+        it "returns not_found status" do
+          expect(products_controller.show[:status]).to eq(:not_found)
+        end
+      end
+    end
   end
 end

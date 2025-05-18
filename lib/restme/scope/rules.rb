@@ -30,7 +30,11 @@ module Restme
       end
 
       def model_scope_object
-        @model_scope_object ||= model_scope.first
+        @model_scope_object ||= begin
+          model_scope
+
+          restme_scope_errors.presence || model_scope.first
+        end
       end
 
       private
