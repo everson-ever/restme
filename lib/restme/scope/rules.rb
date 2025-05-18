@@ -23,14 +23,18 @@ module Restme
       include ::Restme::Shared::UserRole
 
       attr_reader :filtered_scope, :sorted_scope, :paginated_scope, :fieldated_scope
-      attr_accessor :restme_scope_errors, :restme_scope_status
+      attr_writer :restme_scope_errors, :restme_scope_status
 
       def pagination_response
         @pagination_response ||= restme_response
       end
 
       def model_scope_object
-        @model_scope_object ||= model_scope.first
+        @model_scope_object ||= begin
+          model_scope
+
+          restme_scope_errors.presence || model_scope.first
+        end
       end
 
       private

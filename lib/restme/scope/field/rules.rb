@@ -10,9 +10,8 @@ module Restme
         include Restme::Scope::Field::Attachable
 
         def fieldable_scope(user_scope)
-          unallowed_select_fields_error
-
           return user_scope unless select_any_field?
+          return user_scope if unallowed_select_fields_error
 
           scoped = user_scope
 
@@ -78,6 +77,8 @@ module Restme
           restme_scope_errors({ body: unallowed_fields_selected, message: "Selected not allowed fields" })
 
           restme_scope_status(:bad_request)
+
+          true
         end
 
         def unallowed_fields_selected

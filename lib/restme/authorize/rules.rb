@@ -12,9 +12,25 @@ module Restme
 
       def user_authorize
         return true unless restme_current_user
-        return if super_authorize? || allowed_roles_actions[action_name.to_sym]&.include?(user_role.to_sym)
+        return authorize_errors unless authorize?
 
-        render json: { message: "Action not allowed" }, status: :forbidden
+        true
+      end
+
+      def authorize?
+        super_authorize? ||
+          allowed_roles_actions[action_name.to_sym]&.include?(user_role.to_sym)
+      end
+
+      def authorize_errors
+        restme_scope_errors(
+          {
+            message: "Action not allowed",
+            body: {}
+          }
+        )
+
+        restme_scope_status(:forbidden)
       end
 
       def allowed_roles_actions

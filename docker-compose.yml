@@ -9,5 +9,25 @@ services:
     volumes:
       - .:/var/www/restme
     mem_limit: 1024mb
+    depends_on:
+      - restme_postgres
+  restme_postgres:
+    image: postgres:15.8-alpine
+    container_name: restme_postgres
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    mem_limit: 512mb
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USERNAME=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 volumes:
   app:
+  postgres_db:
