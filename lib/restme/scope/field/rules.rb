@@ -77,6 +77,8 @@ module Restme
           restme_scope_errors({ body: unallowed_fields_selected, message: "Selected not allowed fields" })
 
           restme_scope_status(:bad_request)
+
+          true
         end
 
         def unallowed_fields_selected
