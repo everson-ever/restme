@@ -11,7 +11,6 @@ module Restme
 
         def sortable_scope(user_scope)
           return user_scope unless sortable_scope?
-          return user_scope if unknown_sortable_fields_errors
 
           user_scope.order(serialize_sort_params)
         end

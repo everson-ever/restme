@@ -39,7 +39,6 @@ module Restme
           @user_scope = user_scope
 
           return user_scope unless filterable_scope?
-          return user_scope if unallowed_filter_fields_errors
           return user_scope if record_not_found_errors
 
           processed_scope
@@ -64,7 +63,6 @@ module Restme
             end
 
             record_field = param_key.to_s.gsub("_#{filter_type}", "")&.to_sym
-
             next unless filter_type
             next unless filteable_fields.include?(record_field)
 
@@ -83,8 +81,6 @@ module Restme
         end
 
         def filterable_scope?
-          try_insert_id_equal
-
           request.get? && controller_params_filters_fields.present?
         end
 
@@ -95,6 +91,8 @@ module Restme
         end
 
         def unallowed_filter_fields_errors
+          try_insert_id_equal
+
           return unless unallowed_fields_to_filter.present?
 
           restme_scope_errors(
