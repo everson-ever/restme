@@ -31,7 +31,7 @@ module Restme
 
       def model_scope_object
         @model_scope_object ||= begin
-          model_scope
+          model_scope unless any_scope_errors.present?
 
           restme_scope_errors.presence || model_scope.first
         end
@@ -40,12 +40,21 @@ module Restme
       private
 
       def restme_response
-        model_scope
+        any_scope_errors
 
         restme_scope_errors.presence || {
           objects: model_scope,
           pagination: pagination
         }
+      end
+
+      def any_scope_errors
+        per_page_errors
+        unknown_sortable_fields_errors
+        unallowed_filter_fields_errors
+        unallowed_select_fields_errors
+
+        restme_scope_errors
       end
 
       def model_scope
@@ -61,7 +70,9 @@ module Restme
       end
 
       def restme_scope_errors(error = nil)
-        @restme_scope_errors ||= error
+        @restme_scope_errors ||= []
+        @restme_scope_errors << error if error.present?
+        @restme_scope_errors
       end
 
       def restme_scope_status(status = :ok)

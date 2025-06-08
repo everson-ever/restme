@@ -66,7 +66,7 @@ RSpec.describe "RestmeController", type: :controller do
           let(:user_role) { :other_role }
 
           let(:expected_result) do
-            { body: {}, message: "Action not allowed" }.as_json
+            [{ body: {}, message: "Action not allowed" }].as_json
           end
 
           it "returns forbidden response" do
@@ -208,7 +208,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              { body: ["invalid_field"], message: "Selected not allowed fields" }
+              [{ body: ["invalid_field"], message: "Selected not allowed fields" }]
             end
 
             it "returns products" do
@@ -282,7 +282,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              { body: ["user"], message: "Selected not allowed fields" }
+              [{ body: ["user"], message: "Selected not allowed fields" }]
             end
 
             it "returns products" do
@@ -362,7 +362,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              { body: ["updated_at"], message: "Unknown Sort" }.as_json
+              [{ body: ["updated_at"], message: "Unknown Sort" }].as_json
             end
 
             it "returns products" do
@@ -436,7 +436,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              { body: ["updated_at"], message: "Unknown Sort" }.as_json
+              [{ body: ["updated_at"], message: "Unknown Sort" }].as_json
             end
 
             it "returns products" do
@@ -520,10 +520,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["code_equal"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -585,10 +585,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["code_like"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -646,10 +646,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["code_in"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -768,10 +768,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["updated_at_bigger_than"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -891,10 +891,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["updated_at_bigger_than_or_equal_to"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -1011,10 +1011,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["updated_at_less_than"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -1133,10 +1133,10 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                {
+                [{
                   body: ["updated_at_less_than_or_equal_to"],
                   message: "Unknown Filter Fields"
-                }.as_json
+                }].as_json
               end
 
               it "returns products" do
@@ -1147,6 +1147,41 @@ RSpec.describe "RestmeController", type: :controller do
                 expect(products_controller.index[:status]).to eq(:bad_request)
               end
             end
+          end
+        end
+      end
+
+      context "with many scope errors" do
+        context "when field is not allowed to filter" do
+          context "with code_equal" do
+            let(:query_parameters) do
+              {
+                code_equal: product_a.code,
+                fields_select: "id,name",
+                updated_at_sort: "DESC"
+              }
+            end
+
+            let(:expected_result) do
+              [
+                {
+                  body: ["updated_at"],
+                  message: "Unknown Sort"
+                },
+                {
+                  body: ["code_equal"],
+                  message: "Unknown Filter Fields"
+                }
+              ].as_json
+            end
+
+            it "returns products" do
+              expect(products_controller.index[:body]).to eq(expected_result)
+            end
+
+            # it "returns bad request error" do
+            #   expect(products_controller.index[:status]).to eq(:bad_request)
+            # end
           end
         end
       end
@@ -1236,7 +1271,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              { body: ["invalid_field"], message: "Selected not allowed fields" }
+              [{ body: ["invalid_field"], message: "Selected not allowed fields" }]
             end
 
             it "returns products" do
@@ -1303,7 +1338,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              { body: ["user"], message: "Selected not allowed fields" }
+              [{ body: ["user"], message: "Selected not allowed fields" }]
             end
 
             it "returns products" do
@@ -1325,12 +1360,12 @@ RSpec.describe "RestmeController", type: :controller do
         end
 
         let(:expected_result) do
-          {
+          [{
             body: {
               id: 10_000
             },
             message: "Record not found"
-          }.as_json
+          }].as_json
         end
 
         it "returns products" do

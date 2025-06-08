@@ -11,7 +11,6 @@ module Restme
 
         def fieldable_scope(user_scope)
           return user_scope unless select_any_field?
-          return user_scope if unallowed_select_fields_error
 
           scoped = user_scope
 
@@ -71,7 +70,7 @@ module Restme
             end&.map(&:to_sym)
         end
 
-        def unallowed_select_fields_error
+        def unallowed_select_fields_errors
           return if unallowed_fields_selected.blank?
 
           restme_scope_errors({ body: unallowed_fields_selected, message: "Selected not allowed fields" })
