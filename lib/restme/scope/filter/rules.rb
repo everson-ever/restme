@@ -36,16 +36,24 @@ module Restme
         private
 
         def filterable_scope(user_scope)
-          return user_scope unless filterable_scope?
-          return user_scope if unallowed_filter_fields_errors
+          @user_scope = user_scope
 
-          next_scope = where_equal(user_scope)
-          next_scope = where_like(next_scope)
-          next_scope = where_bigger_than(next_scope)
-          next_scope = where_less_than(next_scope)
-          next_scope = where_bigger_than_or_equal_to(next_scope)
-          next_scope = where_less_than_or_equal_to(next_scope)
-          where_in(next_scope)
+          return user_scope unless filterable_scope?
+          return user_scope if record_not_found_errors
+
+          processed_scope
+        end
+
+        def processed_scope
+          @processed_scope ||= begin
+            next_scope = where_equal(@user_scope)
+            next_scope = where_like(next_scope)
+            next_scope = where_bigger_than(next_scope)
+            next_scope = where_less_than(next_scope)
+            next_scope = where_bigger_than_or_equal_to(next_scope)
+            next_scope = where_less_than_or_equal_to(next_scope)
+            where_in(next_scope)
+          end
         end
 
         def allowed_fields
@@ -55,7 +63,6 @@ module Restme
             end
 
             record_field = param_key.to_s.gsub("_#{filter_type}", "")&.to_sym
-
             next unless filter_type
             next unless filteable_fields.include?(record_field)
 
@@ -74,8 +81,6 @@ module Restme
         end
 
         def filterable_scope?
-          try_insert_id_equal
-
           request.get? && controller_params_filters_fields.present?
         end
 
@@ -86,6 +91,8 @@ module Restme
         end
 
         def unallowed_filter_fields_errors
+          try_insert_id_equal
+
           return unless unallowed_fields_to_filter.present?
 
           restme_scope_errors(
@@ -96,6 +103,16 @@ module Restme
           )
 
           restme_scope_status(:bad_request)
+
+          true
+        end
+
+        def record_not_found_errors
+          return if params[:id].blank? || processed_scope.exists?
+
+          restme_scope_errors({ body: { id: params[:id] }, message: "Record not found" })
+
+          restme_scope_status(:not_found)
 
           true
         end
