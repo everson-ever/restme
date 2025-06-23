@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    restme (0.0.39)
+    restme (1.0.1)
 
 GEM
   remote: https://rubygems.org/

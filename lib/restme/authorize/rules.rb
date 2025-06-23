@@ -10,11 +10,12 @@ module Restme
       include ::Restme::Shared::CurrentModel
       include ::Restme::Shared::UserRole
 
-      def user_authorize
-        return true unless restme_current_user
-        return authorize_errors unless authorize?
+      def user_authorized?
+        return true if restme_current_user.blank? || authorize?
 
-        true
+        authorize_errors
+
+        false
       end
 
       def authorize?

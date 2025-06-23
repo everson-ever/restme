@@ -18,10 +18,14 @@ module Restme
     def initialize_restme
       use_current_user
 
-      user_authorize
+      restme_authorize_response unless user_authorized?
     end
 
     private
+
+    def restme_authorize_response
+      render json: restme_scope_errors, status: restme_scope_status
+    end
 
     def use_current_user
       @restme_current_user = try(:current_user)

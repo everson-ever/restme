@@ -58,7 +58,7 @@ module Restme
       end
 
       def model_scope
-        @model_scope ||= without_item_in_scope? ? user_scope : custom_scope
+        @model_scope ||= custom_scope
       end
 
       def pagination
@@ -77,10 +77,6 @@ module Restme
 
       def restme_scope_status(status = :ok)
         @restme_scope_status ||= status
-      end
-
-      def without_item_in_scope?
-        !user_scope.exists?
       end
 
       def custom_scope
