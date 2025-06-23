@@ -17,7 +17,7 @@ services:
     volumes:
       - postgres_db:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5442:5432"
     mem_limit: 512mb
     restart: unless-stopped
     environment:
