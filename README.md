@@ -11,13 +11,12 @@ This gem manages your controller's responsibilities for:
 ## Installation
 
 
-
+GEMFILE:
 ```bash
 gem 'restme', '~> 1.0', '>= 1.0.1'
 ```
 
-OR
-
+INSTALL:
 ```bash
 gem 'restme'
 ```
