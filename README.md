@@ -13,7 +13,7 @@ This gem manages your controller's responsibilities for:
 
 
 ```bash
-gem install restme
+gem 'restme', '~> 1.0', '>= 1.0.1'
 ```
 
 OR
@@ -25,10 +25,7 @@ gem 'restme'
 ## Usage
 
 #### ℹ️ Current Version of gem require the following pré configs
-
- - If your controller defines an instance variable named `current_user`, Restme will automatically assign it to `model.current_user` during create and update actions—provided your model responds to the `current_user` method.
- - Your user model must have a role attribute (user.role).
- - Your controllers must be named using the plural form of the model (e.g., Product → ProductsController). Alternatively, you can manually set the model name by defining the MODEL_NAME constant (e.g., MODEL_NAME = "Shopping").
+ - Your controllers must be named using the plural form of the model (e.g., Product → ProductsController). Alternatively, you can manually set the model name by defining the MODEL_NAME constant (e.g., MODEL_NAME = "Product").
  - You must create a folder inside app named restfy to define controller rules for authorization, scoping, creation, updating, and field selection (see example below).
 
 
