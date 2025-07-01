@@ -35,7 +35,7 @@ module Restme
       end
 
       def allowed_roles_actions
-        return {} unless authorize_rules_class.const_defined?(:ALLOWED_ROLES_ACTIONS)
+        return {} unless authorize_rules_class&.const_defined?(:ALLOWED_ROLES_ACTIONS)
 
         authorize_rules_class::ALLOWED_ROLES_ACTIONS
       end
@@ -45,7 +45,7 @@ module Restme
       end
 
       def authorize_rules_class
-        "#{controller_class.to_s.split("::").last}::Authorize::Rules".constantize
+        "#{controller_class.to_s.split("::").last}::Authorize::Rules".safe_constantize
       end
     end
   end
