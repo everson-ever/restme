@@ -4,8 +4,8 @@ class ProductsController
   module Authorize
     class Rules
       ALLOWED_ROLES_ACTIONS = {
-        index: %i[client manager],
-        show: %i[client manager]
+        index: %i[super_admin client manager],
+        show: %i[super_admin client manager]
       }.freeze
     end
   end

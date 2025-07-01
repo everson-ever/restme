@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../shared/user_role"
+require_relative "../shared/restme_current_user_role"
 require_relative "../shared/current_model"
 require_relative "../shared/controller_params"
 
@@ -74,13 +74,9 @@ module Restme
       def updateable_scope?
         return true unless restme_current_user
 
-        method_scope = "#{updateable_current_action}_#{user_role}_scope?"
+        method_scope = "#{updateable_current_action}_#{restme_current_user_role}_scope?"
 
-        updateable_super_admin_scope? || update_rules_class.try(method_scope) || false
-      end
-
-      def updateable_super_admin_scope?
-        restme_current_user&.super_admin?
+        update_rules_class.try(method_scope) || false
       end
 
       def updateable_record_errors_messages
