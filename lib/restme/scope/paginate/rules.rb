@@ -5,9 +5,9 @@ module Restme
     module Paginate
       # Defines pagination rules
       module Rules
-        DEFAULT_PER_PAGE = ENV.fetch("PAGINATION_DEFAULT_PER_PAGE", 12)
-        DEFAULT_PAGE = ENV.fetch("PAGINATION_DEFAULT_PAGE", 1)
-        MAX_PER_PAGE = ENV.fetch("PAGINATION_MAX_PER_PAGE", 100)
+        DEFAULT_PER_PAGE = ::Restme::Configuration.restme_pagination_default_per_page
+        DEFAULT_PAGE = ::Restme::Configuration.restme_pagination_default_page
+        MAX_PER_PAGE = ::Restme::Configuration.restme_pagination_default_max_per_page
 
         def paginable_scope(user_scope)
           user_scope.limit(per_page).offset(paginate_offset)

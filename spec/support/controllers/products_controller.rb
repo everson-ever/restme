@@ -7,8 +7,10 @@ class ProductsController
   attr_reader :action_name
 
   Restme.configure do |config|
-    config.current_user_variable_name = :current_user
-    config.current_user_role_field_name = :role
+    config.restme_current_user_variable_name = :current_user
+    config.restme_current_user_role_field_name = :role
+    config.restme_pagination_default_per_page = 12
+    config.restme_pagination_default_max_per_page = 100
   end
 
   class AuthorizationError < StandardError
