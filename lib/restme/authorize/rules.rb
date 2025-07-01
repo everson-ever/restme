@@ -8,7 +8,7 @@ module Restme
     # Defines the rules used to authotize user
     module Rules
       include ::Restme::Shared::CurrentModel
-      include ::Restme::Shared::UserRole
+      include ::Restme::Shared::RestmeCurrentUserRole
 
       def user_authorized?
         return true if restme_current_user.blank? || authorize?

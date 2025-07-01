@@ -64,7 +64,4 @@ end
 class Establishment < ActiveRecord::Base; end
 
 class User < ActiveRecord::Base
-  def super_admin?
-    role == "super_admin"
-  end
 end

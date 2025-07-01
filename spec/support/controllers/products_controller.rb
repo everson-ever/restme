@@ -6,6 +6,11 @@ class ProductsController
   attr_accessor :params, :request, :current_user
   attr_reader :action_name
 
+  Restme.configure do |config|
+    config.current_user_variable_name = :current_user
+    config.current_user_role_field_name = :role
+  end
+
   class AuthorizationError < StandardError
     attr_reader :json, :status
 

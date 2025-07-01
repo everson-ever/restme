@@ -10,7 +10,7 @@ module Restme
     module Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel
-      include ::Restme::Shared::UserRole
+      include ::Restme::Shared::RestmeCurrentUserRole
 
       attr_reader :update_temp_record
 
