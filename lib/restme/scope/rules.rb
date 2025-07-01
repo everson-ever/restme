@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../shared/user_role"
+require_relative "../shared/restme_current_user_role"
 require_relative "../shared/current_model"
 require_relative "../shared/controller_params"
 require_relative "filter/rules"
@@ -87,11 +87,11 @@ module Restme
       end
 
       def user_scope
-        @user_scope ||= super_admin_scope || scope_rules_class.try(method_scope) || none_scope
+        @user_scope ||= none_user_scope || scope_rules_class.try(method_scope) || none_scope
       end
 
-      def super_admin_scope
-        klass.all if restme_current_user&.super_admin? || restme_current_user.blank?
+      def none_user_scope
+        klass.all if restme_current_user.blank?
       end
 
       def none_scope
@@ -99,7 +99,7 @@ module Restme
       end
 
       def method_scope
-        "#{user_role}_scope"
+        "#{restme_current_user_role}_scope"
       end
 
       def scope_rules_class
