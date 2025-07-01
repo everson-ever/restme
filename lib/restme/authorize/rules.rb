@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../shared/user_role"
+require_relative "../shared/restme_current_user_role"
 require_relative "../shared/current_model"
 
 module Restme
@@ -19,8 +19,8 @@ module Restme
       end
 
       def authorize?
-        super_authorize? ||
-          allowed_roles_actions[action_name.to_sym]&.include?(user_role.to_sym)
+        allowed_roles_actions[action_name.to_sym]
+          &.include?(restme_current_user_role&.to_sym)
       end
 
       def authorize_errors
@@ -38,10 +38,6 @@ module Restme
         return {} unless authorize_rules_class.const_defined?(:ALLOWED_ROLES_ACTIONS)
 
         authorize_rules_class::ALLOWED_ROLES_ACTIONS
-      end
-
-      def super_authorize?
-        restme_current_user&.super_admin?
       end
 
       def authorize_rules_class
