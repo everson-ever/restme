@@ -4,8 +4,8 @@ module Restme
   module Shared
     # Returns the roles associated with the user, if any exist.
     module UserRole
-      def user_role
-        restme_current_user&.role
+      def restme_current_user_role
+        restme_current_user&.try(:role)
       end
     end
   end
