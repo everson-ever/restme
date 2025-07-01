@@ -7,6 +7,10 @@ RSpec.describe "RestmeController", type: :controller do
     ProductsController.new(params: controller_params, request: request, current_user: current_user)
   end
 
+  let(:establishments_controller) do
+    EstablishmentsController.new(params: controller_params, request: request, current_user: current_user)
+  end
+
   let(:controller_params) { {} }
 
   let(:request) do
@@ -81,7 +85,17 @@ RSpec.describe "RestmeController", type: :controller do
 
       context "when authorize rules class does not exists" do
         context "when authorize rules does not exists" do
-          ## TODO: Add support to authorize rules return json error
+          let(:expected_result) do
+            [{ body: {}, message: "Action not allowed" }].as_json
+          end
+
+          it "returns forbidden response" do
+            expect(establishments_controller.index[:body]).to eq(expected_result)
+          end
+
+          it "returns forbidden status" do
+            expect(establishments_controller.index[:status]).to eq(:forbidden)
+          end
         end
       end
     end
@@ -1179,9 +1193,9 @@ RSpec.describe "RestmeController", type: :controller do
               expect(products_controller.index[:body]).to eq(expected_result)
             end
 
-            # it "returns bad request error" do
-            #   expect(products_controller.index[:status]).to eq(:bad_request)
-            # end
+            it "returns bad request error" do
+              expect(products_controller.index[:status]).to eq(:bad_request)
+            end
           end
         end
       end
