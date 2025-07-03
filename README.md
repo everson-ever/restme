@@ -13,7 +13,7 @@ This gem manages your controller's responsibilities for:
 
 GEMFILE:
 ```bash
-gem 'restme', '~> 1.0', '>= 1.0.2'
+gem 'restme', '~> 1.1'
 ```
 
 INSTALL:
@@ -26,6 +26,35 @@ gem 'restme'
 #### ℹ️ Current Version of gem require the following pré configs
  - Your controllers must be named using the plural form of the model (e.g., Product → ProductsController). Alternatively, you can manually set the model name by defining the MODEL_NAME constant (e.g., MODEL_NAME = "Product").
  - You must create a folder inside app named restfy to define controller rules for authorization, scoping, creation, updating, and field selection (see example below).
+
+
+<br>
+
+## Optional Configuration (Available from version 1.1 or higher)
+
+You can create a `restme.rb` file inside `config/initializers` to customize Restme's behavior:
+
+- Define the name of the controller variable that holds the current user (default: `current_user`).
+- Define the name of the user field that identifies the user's role (default: `role`).
+- Set the default number of items returned per page (default: `12`).
+- Set the default starting page (default: `1`).
+- Define the maximum number of items allowed per page (default: `100`).
+
+Example:
+
+```ruby
+# config/initializers/restme.rb
+
+Restme.configure do |config|
+  config.current_user_variable = :current_user
+  config.user_role_field = :role
+  config.pagination_default_per_page = 12
+  config.pagination_default_page = 1
+  config.pagination_max_per_page = 100
+end
+```
+
+<br>
 
 
 ### Usage examples
