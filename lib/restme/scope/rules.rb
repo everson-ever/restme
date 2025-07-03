@@ -20,7 +20,7 @@ module Restme
       include ::Restme::Scope::Filter::Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel
-      include ::Restme::Shared::UserRole
+      include ::Restme::Shared::RestmeCurrentUserRole
 
       attr_reader :filtered_scope, :sorted_scope, :paginated_scope, :fieldated_scope
       attr_writer :restme_scope_errors, :restme_scope_status
