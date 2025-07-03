@@ -3,7 +3,7 @@
 class EstablishmentsController
   include Restme::Restme
 
-  attr_accessor :params, :request, :current_user
+  attr_accessor :params, :request, :current_user, :logged_user
   attr_reader :action_name
 
   class AuthorizationError < StandardError
@@ -17,8 +17,9 @@ class EstablishmentsController
     end
   end
 
-  def initialize(current_user: nil, request: {}, params: {})
+  def initialize(current_user: nil, logged_user: nil, request: {}, params: {})
     @current_user = current_user
+    @logged_user = logged_user
     @request = request
     @params = params
   end

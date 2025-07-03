@@ -3,15 +3,8 @@
 class ProductsController
   include Restme::Restme
 
-  attr_accessor :params, :request, :current_user
+  attr_accessor :params, :request, :current_user, :logged_user
   attr_reader :action_name
-
-  Restme.configure do |config|
-    config.restme_current_user_variable_name = :current_user
-    config.restme_current_user_role_field_name = :role
-    config.restme_pagination_default_per_page = 12
-    config.restme_pagination_default_max_per_page = 100
-  end
 
   class AuthorizationError < StandardError
     attr_reader :json, :status
@@ -24,8 +17,9 @@ class ProductsController
     end
   end
 
-  def initialize(current_user: nil, request: {}, params: {})
+  def initialize(current_user: nil, logged_user: nil, request: {}, params: {})
     @current_user = current_user
+    @logged_user = logged_user
     @request = request
     @params = params
   end
