@@ -3,18 +3,18 @@
 module Restme
   # Defines the initialization configuration for restme gem
   module Configuration
-    @restme_current_user_variable_name = :current_user
-    @restme_current_user_role_field_name = :role
-    @restme_pagination_default_per_page = 12
-    @restme_pagination_default_page = 1
-    @restme_pagination_default_max_per_page = 100
+    @current_user_variable = :current_user
+    @user_role_field = :role
+    @pagination_default_per_page = 12
+    @pagination_default_page = 1
+    @pagination_max_per_page = 100
 
     class << self
-      attr_accessor :restme_current_user_variable_name,
-                    :restme_current_user_role_field_name,
-                    :restme_pagination_default_per_page,
-                    :restme_pagination_default_page,
-                    :restme_pagination_default_max_per_page
+      attr_accessor :current_user_variable,
+                    :user_role_field,
+                    :pagination_default_per_page,
+                    :pagination_default_page,
+                    :pagination_max_per_page
     end
   end
 end

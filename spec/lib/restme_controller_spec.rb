@@ -41,10 +41,10 @@ RSpec.describe "RestmeController", type: :controller do
   let(:establishment) { Establishment.create(name: "Foo") }
 
   describe "restme config" do
-    context "with restme_current_user_variable_name" do
+    context "with current_user_variable" do
       before do
         Restme.configure do |config|
-          config.restme_current_user_variable_name = :logged_user
+          config.current_user_variable = :logged_user
         end
       end
 
@@ -61,10 +61,10 @@ RSpec.describe "RestmeController", type: :controller do
       end
     end
 
-    context "with restme_current_user_role_field_name" do
+    context "with user_role_field" do
       before do
         Restme.configure do |config|
-          config.restme_current_user_role_field_name = :user_role
+          config.user_role_field = :user_role
         end
       end
 
@@ -81,16 +81,16 @@ RSpec.describe "RestmeController", type: :controller do
       end
     end
 
-    context "with restme_pagination_default_page" do
+    context "with pagination_default_page" do
       before do
         Restme.configure do |config|
-          config.restme_pagination_default_page = 10
+          config.pagination_default_page = 10
         end
       end
 
       after do
         Restme.configure do |config|
-          config.restme_pagination_default_page = 1
+          config.pagination_default_page = 1
         end
       end
 
@@ -107,16 +107,16 @@ RSpec.describe "RestmeController", type: :controller do
       end
     end
 
-    context "with restme_pagination_default_max_per_page" do
+    context "with pagination_max_per_page" do
       before do
         Restme.configure do |config|
-          config.restme_pagination_default_max_per_page = 10
+          config.pagination_max_per_page = 10
         end
       end
 
       after do
         Restme.configure do |config|
-          config.restme_pagination_default_max_per_page = 100
+          config.pagination_max_per_page = 100
         end
       end
 
@@ -139,10 +139,10 @@ RSpec.describe "RestmeController", type: :controller do
       end
     end
 
-    context "with restme_pagination_default_per_page" do
+    context "with pagination_default_per_page" do
       before do
         Restme.configure do |config|
-          config.restme_pagination_default_per_page = 2
+          config.pagination_default_per_page = 2
         end
 
         product_a
@@ -152,7 +152,7 @@ RSpec.describe "RestmeController", type: :controller do
 
       after do
         Restme.configure do |config|
-          config.restme_pagination_default_per_page = 12
+          config.pagination_default_per_page = 12
         end
       end
 

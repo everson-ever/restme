@@ -29,7 +29,7 @@ module Restme
 
     def use_current_user
       @restme_current_user =
-        try(::Restme::Configuration.restme_current_user_variable_name)
+        try(::Restme::Configuration.current_user_variable)
     end
   end
 end

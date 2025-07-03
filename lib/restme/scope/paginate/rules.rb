@@ -10,7 +10,7 @@ module Restme
         end
 
         def page_no
-          params[:page]&.to_i || ::Restme::Configuration.restme_pagination_default_page
+          params[:page]&.to_i || ::Restme::Configuration.pagination_default_page
         end
 
         def pages(user_scope)
@@ -22,7 +22,7 @@ module Restme
         end
 
         def per_page
-          params[:per_page]&.to_i || ::Restme::Configuration.restme_pagination_default_per_page
+          params[:per_page]&.to_i || ::Restme::Configuration.pagination_default_per_page
         end
 
         def paginate_offset
@@ -30,12 +30,12 @@ module Restme
         end
 
         def per_page_errors
-          return if per_page <= ::Restme::Configuration.restme_pagination_default_max_per_page
+          return if per_page <= ::Restme::Configuration.pagination_max_per_page
 
           restme_scope_errors(
             {
               message: "Invalid per page value",
-              body: { per_page_max_value: ::Restme::Configuration.restme_pagination_default_max_per_page }
+              body: { per_page_max_value: ::Restme::Configuration.pagination_max_per_page }
             }
           )
 
