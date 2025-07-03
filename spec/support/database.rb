@@ -49,6 +49,7 @@ ActiveRecord::Schema.define do
   create_table :users, force: true do |t|
     t.string :name
     t.string :role
+    t.string :user_role
     t.timestamps
   end
 end
@@ -64,7 +65,4 @@ end
 class Establishment < ActiveRecord::Base; end
 
 class User < ActiveRecord::Base
-  def super_admin?
-    role == "super_admin"
-  end
 end

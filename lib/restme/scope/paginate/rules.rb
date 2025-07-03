@@ -5,16 +5,12 @@ module Restme
     module Paginate
       # Defines pagination rules
       module Rules
-        DEFAULT_PER_PAGE = ENV.fetch("PAGINATION_DEFAULT_PER_PAGE", 12)
-        DEFAULT_PAGE = ENV.fetch("PAGINATION_DEFAULT_PAGE", 1)
-        MAX_PER_PAGE = ENV.fetch("PAGINATION_MAX_PER_PAGE", 100)
-
         def paginable_scope(user_scope)
           user_scope.limit(per_page).offset(paginate_offset)
         end
 
         def page_no
-          params[:page]&.to_i || DEFAULT_PAGE
+          params[:page]&.to_i || ::Restme::Configuration.pagination_default_page
         end
 
         def pages(user_scope)
@@ -26,7 +22,7 @@ module Restme
         end
 
         def per_page
-          params[:per_page]&.to_i || DEFAULT_PER_PAGE
+          params[:per_page]&.to_i || ::Restme::Configuration.pagination_default_per_page
         end
 
         def paginate_offset
@@ -34,12 +30,12 @@ module Restme
         end
 
         def per_page_errors
-          return if per_page <= MAX_PER_PAGE
+          return if per_page <= ::Restme::Configuration.pagination_max_per_page
 
           restme_scope_errors(
             {
               message: "Invalid per page value",
-              body: { per_page_max_value: MAX_PER_PAGE }
+              body: { per_page_max_value: ::Restme::Configuration.pagination_max_per_page }
             }
           )
 

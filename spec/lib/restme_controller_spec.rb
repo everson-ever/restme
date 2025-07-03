@@ -4,11 +4,20 @@ require "spec_helper"
 
 RSpec.describe "RestmeController", type: :controller do
   let(:products_controller) do
-    ProductsController.new(params: controller_params, request: request, current_user: current_user)
+    ProductsController.new(**controller_arguments)
   end
 
   let(:establishments_controller) do
-    EstablishmentsController.new(params: controller_params, request: request, current_user: current_user)
+    EstablishmentsController.new(**controller_arguments)
+  end
+
+  let(:controller_arguments) do
+    {
+      params: controller_params,
+      request: request,
+      current_user: current_user,
+      logged_user: current_user
+    }
   end
 
   let(:controller_params) { {} }
@@ -18,7 +27,7 @@ RSpec.describe "RestmeController", type: :controller do
   end
 
   let(:current_user) do
-    User.create(name: "Restme", role: user_role)
+    User.create(name: "Restme", role: user_role, user_role: user_role)
   end
 
   let(:user_role) { :client }
@@ -30,6 +39,142 @@ RSpec.describe "RestmeController", type: :controller do
   let(:product_c) { Product.create(name: "BarBar", code: "GHI", establishment_id: establishment.id) }
 
   let(:establishment) { Establishment.create(name: "Foo") }
+
+  describe "restme config" do
+    context "with current_user_variable" do
+      before do
+        Restme.configure do |config|
+          config.current_user_variable = :logged_user
+        end
+      end
+
+      let(:expected_result) do
+        { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+      end
+
+      it "rreturns success response" do
+        expect(products_controller.index[:body]).to eq(expected_result)
+      end
+
+      it "returns success status" do
+        expect(products_controller.index[:status]).to eq(:ok)
+      end
+    end
+
+    context "with user_role_field" do
+      before do
+        Restme.configure do |config|
+          config.user_role_field = :user_role
+        end
+      end
+
+      let(:expected_result) do
+        { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+      end
+
+      it "rreturns success response" do
+        expect(products_controller.index[:body]).to eq(expected_result)
+      end
+
+      it "returns success status" do
+        expect(products_controller.index[:status]).to eq(:ok)
+      end
+    end
+
+    context "with pagination_default_page" do
+      before do
+        Restme.configure do |config|
+          config.pagination_default_page = 10
+        end
+      end
+
+      after do
+        Restme.configure do |config|
+          config.pagination_default_page = 1
+        end
+      end
+
+      let(:expected_result) do
+        { objects: [], pagination: { page: 10, pages: 0, total_items: 0 } }.as_json
+      end
+
+      it "rreturns success response" do
+        expect(products_controller.index[:body]).to eq(expected_result)
+      end
+
+      it "returns success status" do
+        expect(products_controller.index[:status]).to eq(:ok)
+      end
+    end
+
+    context "with pagination_max_per_page" do
+      before do
+        Restme.configure do |config|
+          config.pagination_max_per_page = 10
+        end
+      end
+
+      after do
+        Restme.configure do |config|
+          config.pagination_max_per_page = 100
+        end
+      end
+
+      let(:query_parameters) do
+        {
+          per_page: 11
+        }
+      end
+
+      let(:expected_result) do
+        [{ body: { per_page_max_value: 10 }, message: "Invalid per page value" }].as_json
+      end
+
+      it "rreturns success response" do
+        expect(products_controller.index[:body]).to eq(expected_result)
+      end
+
+      it "returns success status" do
+        expect(products_controller.index[:status]).to eq(:bad_request)
+      end
+    end
+
+    context "with pagination_default_per_page" do
+      before do
+        Restme.configure do |config|
+          config.pagination_default_per_page = 2
+        end
+
+        product_a
+        product_b
+        product_c
+      end
+
+      after do
+        Restme.configure do |config|
+          config.pagination_default_per_page = 12
+        end
+      end
+
+      let(:query_parameters) do
+        {
+          fields_select: "id"
+        }
+      end
+
+      let(:expected_result) do
+        { objects: [{ id: 1 }, { id: 2 }], pagination: { page: 1, pages: 1, total_items: 2 } }.as_json
+      end
+
+      it "rreturns success response" do
+        expect(products_controller.index[:body]).to eq(expected_result)
+      end
+
+      it "returns success status" do
+        expect(products_controller.index[:status]).to eq(:ok)
+      end
+    end
+  end
 
   describe "authorize rules" do
     context "when controller have current_user" do
