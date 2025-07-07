@@ -163,7 +163,7 @@ RSpec.describe "RestmeController", type: :controller do
       end
 
       let(:expected_result) do
-        { objects: [{ id: 1 }, { id: 2 }], pagination: { page: 1, pages: 1, total_items: 2 } }.as_json
+        { objects: [{ id: 1 }, { id: 2 }], pagination: { page: 1, pages: 2, total_items: 3 } }.as_json
       end
 
       it "rreturns success response" do
