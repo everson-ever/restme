@@ -64,8 +64,8 @@ module Restme
       def pagination
         {
           page: page_no,
-          pages: pages(model_scope),
-          total_items: total_items(model_scope)
+          pages: pages(filtered_scope),
+          total_items: total_items(filtered_scope)
         }
       end
 
