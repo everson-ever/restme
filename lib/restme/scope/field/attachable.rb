@@ -13,11 +13,13 @@ module Restme
           scope = scope.includes(attachment_fields_select_includes).uniq
 
           scope.map do |record|
+            record_hash = record.as_json
+
             attachment_fields_select.each do |field|
-              @record = record.as_json.merge({ "#{field}": record.send(field).url })
+              record_hash.merge!("#{field}": record.send(field).url)
             end
 
-            @record
+            record_hash
           end
         end
 
