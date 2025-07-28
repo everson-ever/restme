@@ -11,6 +11,10 @@ RSpec.describe "RestmeController", type: :controller do
     EstablishmentsController.new(**controller_arguments)
   end
 
+  let(:settings_controller) do
+    SettingsController.new(**controller_arguments)
+  end
+
   let(:controller_arguments) do
     {
       params: controller_params,
@@ -235,11 +239,11 @@ RSpec.describe "RestmeController", type: :controller do
           end
 
           it "returns forbidden response" do
-            expect(establishments_controller.index[:body]).to eq(expected_result)
+            expect(settings_controller.index[:body]).to eq(expected_result)
           end
 
           it "returns forbidden status" do
-            expect(establishments_controller.index[:status]).to eq(:forbidden)
+            expect(settings_controller.index[:status]).to eq(:forbidden)
           end
         end
       end
@@ -401,6 +405,7 @@ RSpec.describe "RestmeController", type: :controller do
                     establishment: {
                       id: establishment.id,
                       name: "Foo",
+                      setting_id: nil,
                       created_at: "2025-05-12T00:00:00.000Z",
                       updated_at: "2025-05-12T00:00:00.000Z"
                     }
@@ -415,6 +420,7 @@ RSpec.describe "RestmeController", type: :controller do
                     establishment: {
                       id: establishment.id,
                       name: "Foo",
+                      setting_id: nil,
                       created_at: "2025-05-12T00:00:00.000Z",
                       updated_at: "2025-05-12T00:00:00.000Z"
                     }
@@ -1500,7 +1506,7 @@ RSpec.describe "RestmeController", type: :controller do
 
               let(:expected_result) do
                 {
-                  id: 1,
+                  id: establishment.id,
                   name: "Foo",
                   setting_id: nil,
                   setting: nil,
@@ -1513,9 +1519,9 @@ RSpec.describe "RestmeController", type: :controller do
                 expect(establishments_controller.show[:body]).to eq(expected_result)
               end
 
-              # it "returns ok status" do
-              #   expect(establishments_controller.show[:status]).to eq(:ok)
-              # end
+              it "returns ok status" do
+                expect(establishments_controller.show[:status]).to eq(:ok)
+              end
             end
           end
 

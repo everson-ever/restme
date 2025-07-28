@@ -1,0 +1,52 @@
+# frozen_string_literal: true
+
+class SettingsController
+  include Restme::Restme
+
+  attr_accessor :params, :request, :current_user, :logged_user
+  attr_reader :action_name
+
+  class AuthorizationError < StandardError
+    attr_reader :json, :status
+
+    def initialize(json: {}, status: nil)
+      @json = json
+      @status = status
+
+      super
+    end
+  end
+
+  def initialize(current_user: nil, logged_user: nil, request: {}, params: {})
+    @current_user = current_user
+    @logged_user = logged_user
+    @request = request
+    @params = params
+  end
+
+  def index
+    @action_name = "index"
+
+    initialize_restme
+
+    {
+      body: pagination_response.as_json,
+      status: restme_scope_status
+    }
+  rescue AuthorizationError => e
+    authorization_erro(e)
+  end
+
+  def render(json: {}, status: nil)
+    return unless status == :forbidden
+
+    raise AuthorizationError.new(json: json, status: status)
+  end
+
+  def authorization_erro(error)
+    {
+      body: error.json.as_json,
+      status: error.status
+    }
+  end
+end
