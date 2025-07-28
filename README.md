@@ -215,6 +215,10 @@ module ProductsController::Field
       },
       category: {
         table_name: :categories
+      },
+      producer: { # When a nested field can be nil, Restme will not return the primary model unless a LEFT JOIN is explicitly used.
+        table_name: :producers,
+        join_type: :left_joins  # Use that so Restme will generate a LEFT JOIN instead of an INNER JOIN. This will
       }
     }.freeze
   end
