@@ -1445,41 +1445,77 @@ RSpec.describe "RestmeController", type: :controller do
 
         context "with _nested_fields_select" do
           context "when passed fields are allowed to select" do
-            let(:controller_params) do
-              {
-                id: product_a.id
-              }
+            context "when nested_field have value associated" do
+              let(:controller_params) do
+                {
+                  id: product_a.id
+                }
+              end
+
+              let(:query_parameters) do
+                {
+                  nested_fields_select: "establishment"
+                }
+              end
+
+              let(:expected_result) do
+                {
+                  id: product_a.id,
+                  name: "Bar",
+                  code: "ABC",
+                  establishment_id: establishment.id,
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z",
+                  establishment: {
+                    id: establishment.id,
+                    name: "Foo",
+                    setting_id: nil,
+                    created_at: "2025-05-12T00:00:00.000Z",
+                    updated_at: "2025-05-12T00:00:00.000Z"
+                  }
+                }.as_json
+              end
+
+              it "returns products" do
+                expect(products_controller.show[:body]).to eq(expected_result)
+              end
+
+              it "returns ok status" do
+                expect(products_controller.show[:status]).to eq(:ok)
+              end
             end
 
-            let(:query_parameters) do
-              {
-                nested_fields_select: "establishment"
-              }
-            end
+            context "when nested_field does not have value associated" do
+              let(:controller_params) do
+                {
+                  id: establishment.id
+                }
+              end
 
-            let(:expected_result) do
-              {
-                id: product_a.id,
-                name: "Bar",
-                code: "ABC",
-                establishment_id: establishment.id,
-                created_at: "2025-05-12T00:00:00.000Z",
-                updated_at: "2025-05-12T00:00:00.000Z",
-                establishment: {
-                  id: establishment.id,
+              let(:query_parameters) do
+                {
+                  nested_fields_select: "setting"
+                }
+              end
+
+              let(:expected_result) do
+                {
+                  id: 1,
                   name: "Foo",
+                  setting_id: nil,
+                  setting: nil,
                   created_at: "2025-05-12T00:00:00.000Z",
                   updated_at: "2025-05-12T00:00:00.000Z"
-                }
-              }.as_json
-            end
+                }.as_json
+              end
 
-            it "returns products" do
-              expect(products_controller.show[:body]).to eq(expected_result)
-            end
+              it "returns products" do
+                expect(establishments_controller.show[:body]).to eq(expected_result)
+              end
 
-            it "returns ok status" do
-              expect(products_controller.show[:status]).to eq(:ok)
+              # it "returns ok status" do
+              #   expect(establishments_controller.show[:status]).to eq(:ok)
+              # end
             end
           end
 

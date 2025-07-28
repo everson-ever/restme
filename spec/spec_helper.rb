@@ -13,6 +13,9 @@ require_relative "support/controllers/establishments_controller"
 require_relative "support/rules/products_controller/authorize_rules"
 require_relative "support/rules/products_controller/scope_rules"
 require_relative "support/rules/products_controller/field_rules"
+require_relative "support/rules/establishments_controller/authorize_rules"
+require_relative "support/rules/establishments_controller/scope_rules"
+require_relative "support/rules/establishments_controller/field_rules"
 require_relative "support/request_mock"
 
 RSpec.configure do |config|

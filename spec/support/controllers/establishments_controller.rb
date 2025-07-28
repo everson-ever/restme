@@ -37,6 +37,19 @@ class EstablishmentsController
     authorization_erro(e)
   end
 
+  def show
+    @action_name = "show"
+
+    initialize_restme
+
+    {
+      body: model_scope_object.as_json,
+      status: restme_scope_status
+    }
+  rescue AuthorizationError => e
+    authorization_erro(e)
+  end
+
   def render(json: {}, status: nil)
     return unless status == :forbidden
 
