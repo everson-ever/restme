@@ -11,6 +11,7 @@ group :development, :test do
   gem "actionpack"
   gem "activerecord"
   gem "amazing_print", "~> 1.6.0"
+  gem "bundle-audit", "~> 0.1.0"
   gem "byebug"
   gem "database_cleaner-active_record"
   gem "dotenv"
