@@ -6,6 +6,7 @@ require "database_cleaner/active_record"
 require "ostruct"
 require "timecop"
 require "dotenv/load"
+require "amazing_print"
 
 require_relative "support/database"
 require_relative "support/controllers/products_controller"
