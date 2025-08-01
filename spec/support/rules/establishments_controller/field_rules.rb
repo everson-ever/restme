@@ -9,7 +9,8 @@ class EstablishmentsController
           join_type: :left_joins
         },
         products: {
-          table_name: :products
+          table_name: :products,
+          join_type: :left_joins
         }
       }.freeze
     end
