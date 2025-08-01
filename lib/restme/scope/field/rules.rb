@@ -16,51 +16,55 @@ module Restme
 
           scoped = user_scope.select(model_fields_select) if model_fields_select
 
-          scoped = select_nested_scope(scoped) if valid_nested_fields_select
+          scoped = scoped.select(nesteds_table_select) if valid_nested_fields_select
 
           insert_attachments(scoped)
-        end
-
-        def select_nested_scope(scoped)
-          scoped.joins(nested_fields_joins)
-                .left_joins(nested_fields_left_joins)
-                .preload(valid_nested_fields_select)
-                .select(nesteds_table)
         end
 
         def select_any_field?
           fields_select || nested_fields_select || attachment_fields_select
         end
 
-        def nesteds_table
+        def nesteds_table_select
           valid_nested_fields_select&.map do |field|
             table = nested_selectable_fields_keys.dig(field, :table_name)
-            table.present? ? "#{table}::text AS #{field}" : nil
+            relation = relation_type(field)
+
+            if %i[has_many has_one].include?(relation)
+              generate_has_many_query(field, table)
+            elsif relation == :belongs_to
+              generate_belongs_to_query(field, table)
+            end
           end
+        end
+
+        def generate_has_many_query(field, table)
+          <<~SQL
+            (SELECT COALESCE(json_agg(row_to_json(#{table})), '[]') FROM #{table}
+            WHERE #{table}.#{klass.to_s.downcase}_id = #{klass.table_name}.id) AS #{field}
+          SQL
+        end
+
+        def generate_belongs_to_query(field, table)
+          <<~SQL
+            (SELECT row_to_json(#{table}) FROM #{table}
+            WHERE #{table}.id = #{klass.table_name}.#{field}_id) AS #{field}
+          SQL
+        end
+
+        def relation_type(field)
+          klass.reflect_on_association(field.to_sym)&.macro
         end
 
         def model_fields_select
           @model_fields_select ||= begin
-            fields = fields_select&.split(",")
-            fields = fields&.map { |field| "#{klass.table_name}.#{field}" }&.join(",")
-            fields || model_attributes
+            fields = fields_select&.split(",") || model_attributes
+            fields&.map { |field| "#{klass.table_name}.#{field}" }&.join(",")
           end
         end
 
         def model_attributes
           @model_attributes ||= klass.new.attributes.keys
-        end
-
-        def nested_fields_joins
-          @nested_fields_joins ||= valid_nested_fields_select.select do |field|
-            nested_selectable_fields_keys[field.to_sym][:join_type].blank?
-          end
-        end
-
-        def nested_fields_left_joins
-          @nested_fields_left_joins ||= valid_nested_fields_select.select do |field|
-            nested_selectable_fields_keys[field.to_sym][:join_type] == :left_joins
-          end
         end
 
         def valid_nested_fields_select
