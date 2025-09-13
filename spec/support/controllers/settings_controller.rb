@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class EstablishmentsController
+class SettingsController
   include Restme::Restme
 
   attr_accessor :params, :request, :current_user, :logged_user
@@ -31,19 +31,6 @@ class EstablishmentsController
 
     {
       body: pagination_response.as_json,
-      status: restme_scope_status
-    }
-  rescue AuthorizationError => e
-    authorization_erro(e)
-  end
-
-  def show
-    @action_name = "show"
-
-    initialize_restme
-
-    {
-      body: model_scope_object.as_json,
       status: restme_scope_status
     }
   rescue AuthorizationError => e
