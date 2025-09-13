@@ -14,9 +14,9 @@ module Restme
 
           scoped = user_scope
 
-          scoped = user_scope.select(model_fields_select) if model_fields_select
+          scoped = scoped.select(model_fields_select) if model_fields_select
 
-          scoped = scoped.select(nesteds_table_select) if valid_nested_fields_select
+          scoped = scoped.select(nested_fields_sql) if valid_nested_fields_select
 
           insert_attachments(scoped)
         end
@@ -25,29 +25,33 @@ module Restme
           fields_select || nested_fields_select || attachment_fields_select
         end
 
-        def nesteds_table_select
-          valid_nested_fields_select&.map do |field|
-            table = nested_selectable_fields_keys.dig(field, :table_name)
-            relation = relation_type(field)
+        def nested_fields_sql
+          valid_nested_fields_select.map { |field| generate_nested_query(field) }
+        end
 
-            if %i[has_many has_one].include?(relation)
-              generate_has_many_query(field, table)
-            elsif relation == :belongs_to
-              generate_belongs_to_query(field, table)
-            end
+        def generate_nested_query(field)
+          table = nested_field_table(field)
+
+          case relation_type(field)
+          when :has_many, :has_one
+            generate_has_many_query(field, table)
+          when :belongs_to
+            generate_belongs_to_query(field, table)
           end
         end
 
         def generate_has_many_query(field, table)
-          <<~SQL
-            (SELECT COALESCE(json_agg(row_to_json(#{table})), '[]') FROM #{table}
-            WHERE #{table}.#{klass.to_s.downcase}_id = #{klass.table_name}.id) AS #{field}
+          <<~SQL.squish
+            (SELECT COALESCE(json_agg(row_to_json(#{table})), '[]')
+            FROM #{table}
+            WHERE #{table}.#{klass.name.underscore}_id = #{klass.table_name}.id) AS _#{field}
           SQL
         end
 
         def generate_belongs_to_query(field, table)
-          <<~SQL
-            (SELECT row_to_json(#{table}) FROM #{table}
+          <<~SQL.squish
+            (SELECT row_to_json(#{table})
+            FROM #{table}
             WHERE #{table}.id = #{klass.table_name}.#{field}_id) AS #{field}
           SQL
         end
@@ -72,6 +76,10 @@ module Restme
             nested_fields_select&.split(",")&.select do |field|
               nested_selectable_fields_keys[field.to_sym].present?
             end&.map(&:to_sym)
+        end
+
+        def nested_field_table(field)
+          nested_selectable_fields_keys.dig(field, :table_name)
         end
 
         def unallowed_select_fields_errors

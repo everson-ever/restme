@@ -477,7 +477,7 @@ RSpec.describe "RestmeController", type: :controller do
 
             let(:query_parameters) do
               {
-                nested_fields_select: "products,setting",
+                nested_fields_select: "setting,products",
                 id_sort: :asc
               }
             end
@@ -488,68 +488,68 @@ RSpec.describe "RestmeController", type: :controller do
                   {
                     id: establishment.id,
                     name: "Foo",
-                    setting: nil,
                     setting_id: nil,
                     created_at: "2025-05-12T00:00:00.000Z",
                     updated_at: "2025-05-12T00:00:00.000Z",
-                    products: [
+                    setting: nil,
+                    _products: [
                       {
                         id: product_a.id,
                         name: "Bar",
                         code: "ABC",
                         establishment_id: establishment.id,
-                        created_at: "2025-05-12T00:00:00.000Z",
-                        updated_at: "2025-05-12T00:00:00.000Z"
+                        created_at: "2025-05-12T00:00:00",
+                        updated_at: "2025-05-12T00:00:00"
                       },
                       {
                         id: product_b.id,
                         name: "Foo",
                         code: "DEF",
                         establishment_id: establishment.id,
-                        created_at: "2025-05-12T00:00:00.000Z",
-                        updated_at: "2025-05-12T00:00:00.000Z"
+                        created_at: "2025-05-12T00:00:00",
+                        updated_at: "2025-05-12T00:00:00"
                       },
                       {
                         id: product_c.id,
                         name: "BarBar",
                         code: "GHI",
                         establishment_id: establishment.id,
-                        created_at: "2025-05-12T00:00:00.000Z",
-                        updated_at: "2025-05-12T00:00:00.000Z"
+                        created_at: "2025-05-12T00:00:00",
+                        updated_at: "2025-05-12T00:00:00"
                       },
                       {
                         id: product_d.id,
                         name: "Bar",
                         code: "ABC",
                         establishment_id: establishment.id,
-                        created_at: "2025-05-12T00:00:00.000Z",
-                        updated_at: "2025-05-12T00:00:00.000Z"
+                        created_at: "2025-05-12T00:00:00",
+                        updated_at: "2025-05-12T00:00:00"
                       }
                     ]
                   },
                   {
                     id: establishment_two.id,
                     name: "Bar",
-                    setting: nil,
                     setting_id: nil,
                     created_at: "2025-05-12T00:00:00.000Z",
                     updated_at: "2025-05-12T00:00:00.000Z",
-                    products: [
+                    setting: nil,
+                    _products: [
                       {
                         id: product_e.id,
                         name: "Bar",
                         code: "ABC",
                         establishment_id: establishment_two.id,
-                        created_at: "2025-05-12T00:00:00.000Z",
-                        updated_at: "2025-05-12T00:00:00.000Z"
+                        created_at: "2025-05-12T00:00:00",
+                        updated_at: "2025-05-12T00:00:00"
                       },
                       {
                         id: product_f.id,
                         name: "Foo",
                         code: "DEF",
                         establishment_id: establishment_two.id,
-                        created_at: "2025-05-12T00:00:00.000Z",
-                        updated_at: "2025-05-12T00:00:00.000Z"
+                        created_at: "2025-05-12T00:00:00",
+                        updated_at: "2025-05-12T00:00:00"
                       }
                     ]
                   }
