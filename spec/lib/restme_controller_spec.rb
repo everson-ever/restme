@@ -11,6 +11,10 @@ RSpec.describe "RestmeController", type: :controller do
     EstablishmentsController.new(**controller_arguments)
   end
 
+  let(:settings_controller) do
+    SettingsController.new(**controller_arguments)
+  end
+
   let(:controller_arguments) do
     {
       params: controller_params,
@@ -235,11 +239,11 @@ RSpec.describe "RestmeController", type: :controller do
           end
 
           it "returns forbidden response" do
-            expect(establishments_controller.index[:body]).to eq(expected_result)
+            expect(settings_controller.index[:body]).to eq(expected_result)
           end
 
           it "returns forbidden status" do
-            expect(establishments_controller.index[:status]).to eq(:forbidden)
+            expect(settings_controller.index[:status]).to eq(:forbidden)
           end
         end
       end
@@ -330,7 +334,8 @@ RSpec.describe "RestmeController", type: :controller do
           context "when passed fields are allowed to select" do
             let(:query_parameters) do
               {
-                fields_select: "id,name"
+                fields_select: "id,name",
+                id_sort: :asc
               }
             end
 
@@ -384,7 +389,8 @@ RSpec.describe "RestmeController", type: :controller do
           context "when passed fields are allowed to select" do
             let(:query_parameters) do
               {
-                nested_fields_select: "establishment"
+                nested_fields_select: "establishment",
+                id_sort: :asc
               }
             end
 
@@ -401,6 +407,7 @@ RSpec.describe "RestmeController", type: :controller do
                     establishment: {
                       id: establishment.id,
                       name: "Foo",
+                      setting_id: nil,
                       created_at: "2025-05-12T00:00:00.000Z",
                       updated_at: "2025-05-12T00:00:00.000Z"
                     }
@@ -415,6 +422,7 @@ RSpec.describe "RestmeController", type: :controller do
                     establishment: {
                       id: establishment.id,
                       name: "Foo",
+                      setting_id: nil,
                       created_at: "2025-05-12T00:00:00.000Z",
                       updated_at: "2025-05-12T00:00:00.000Z"
                     }
@@ -450,6 +458,131 @@ RSpec.describe "RestmeController", type: :controller do
 
             it "returns ok status" do
               expect(products_controller.index[:status]).to eq(:bad_request)
+            end
+          end
+
+          context "with has_many/belongs_to association" do
+            let(:product_d) { Product.create(name: "Bar", code: "ABC", establishment_id: establishment.id) }
+            let(:product_e) { Product.create(name: "Bar", code: "ABC", establishment_id: establishment_two.id) }
+            let(:product_f) { Product.create(name: "Foo", code: "DEF", establishment_id: establishment_two.id) }
+
+            let(:establishment_two) { Establishment.create(name: "Bar", setting_id: setting.id) }
+
+            let(:setting) { Setting.create(name: :any) }
+
+            let(:controller_params) do
+              {
+                id_in: "#{establishment.id},#{establishment_two.id}",
+                per_page: 3
+              }
+            end
+
+            let(:query_parameters) do
+              {
+                nested_fields_select: "setting,products",
+                id_sort: :asc
+              }
+            end
+
+            let(:expected_result) do
+              {
+                objects: [
+                  {
+                    id: establishment.id,
+                    name: "Foo",
+                    setting_id: nil,
+                    created_at: "2025-05-12T00:00:00.000Z",
+                    updated_at: "2025-05-12T00:00:00.000Z",
+                    products: [
+                      {
+                        id: product_a.id,
+                        name: "Bar",
+                        code: "ABC",
+                        establishment_id: establishment.id,
+                        created_at: "2025-05-12T00:00:00.000Z",
+                        updated_at: "2025-05-12T00:00:00.000Z"
+                      },
+                      {
+                        id: product_b.id,
+                        name: "Foo",
+                        code: "DEF",
+                        establishment_id: establishment.id,
+                        created_at: "2025-05-12T00:00:00.000Z",
+                        updated_at: "2025-05-12T00:00:00.000Z"
+                      },
+                      {
+                        id: product_c.id,
+                        name: "BarBar",
+                        code: "GHI",
+                        establishment_id: establishment.id,
+                        created_at: "2025-05-12T00:00:00.000Z",
+                        updated_at: "2025-05-12T00:00:00.000Z"
+                      },
+                      {
+                        id: product_d.id,
+                        name: "Bar",
+                        code: "ABC",
+                        establishment_id: establishment.id,
+                        created_at: "2025-05-12T00:00:00.000Z",
+                        updated_at: "2025-05-12T00:00:00.000Z"
+                      }
+                    ]
+                  },
+                  {
+                    id: establishment_two.id,
+                    name: "Bar",
+                    setting_id: setting.id,
+                    setting: {
+                      id: setting.id,
+                      name: "any",
+                      created_at: "2025-05-12T00:00:00.000Z",
+                      updated_at: "2025-05-12T00:00:00.000Z"
+                    },
+                    created_at: "2025-05-12T00:00:00.000Z",
+                    updated_at: "2025-05-12T00:00:00.000Z",
+                    products: [
+                      {
+                        id: product_e.id,
+                        name: "Bar",
+                        code: "ABC",
+                        establishment_id: establishment_two.id,
+                        created_at: "2025-05-12T00:00:00.000Z",
+                        updated_at: "2025-05-12T00:00:00.000Z"
+                      },
+                      {
+                        id: product_f.id,
+                        name: "Foo",
+                        code: "DEF",
+                        establishment_id: establishment_two.id,
+                        created_at: "2025-05-12T00:00:00.000Z",
+                        updated_at: "2025-05-12T00:00:00.000Z"
+                      }
+                    ]
+                  }
+                ],
+                pagination: {
+                  page: 1,
+                  pages: 1,
+                  total_items: 2
+                }
+              }.as_json
+            end
+
+            before do
+              product_a
+              product_b
+              product_c
+              product_d
+              product_e
+              product_f
+            end
+
+            it "returns products" do
+              expect(establishments_controller.index[:body]).to eq(expected_result)
+            end
+
+            it "returns ok status" do
+              expect(establishments_controller.show[:status]).to eq(:ok)
             end
           end
         end
@@ -828,7 +961,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   created_at_bigger_than: Time.current - 1.hours,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -950,7 +1084,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   created_at_bigger_than_or_equal_to: Time.current,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -981,7 +1116,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   name_bigger_than_or_equal_to: product_a.name,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1012,7 +1148,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   id_bigger_than_or_equal_to: 1,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1073,7 +1210,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   created_at_less_than: Time.current + 1.hours,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1132,7 +1270,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   id_less_than: product_b.id + 1,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1193,7 +1332,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   created_at_less_than_or_equal_to: Time.current + 1.hours,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1254,7 +1394,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   id_less_than_or_equal_to: product_b.id,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1443,43 +1584,78 @@ RSpec.describe "RestmeController", type: :controller do
           end
         end
 
-        context "with _nested_fields_select" do
+        context "with nested_fields_select" do
           context "when passed fields are allowed to select" do
-            let(:controller_params) do
-              {
-                id: product_a.id
-              }
+            context "when nested_field have value associated" do
+              let(:controller_params) do
+                {
+                  id: product_a.id
+                }
+              end
+
+              let(:query_parameters) do
+                {
+                  nested_fields_select: "establishment"
+                }
+              end
+
+              let(:expected_result) do
+                {
+                  id: product_a.id,
+                  name: "Bar",
+                  code: "ABC",
+                  establishment_id: establishment.id,
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z",
+                  establishment: {
+                    id: establishment.id,
+                    name: "Foo",
+                    setting_id: nil,
+                    created_at: "2025-05-12T00:00:00.000Z",
+                    updated_at: "2025-05-12T00:00:00.000Z"
+                  }
+                }.as_json
+              end
+
+              it "returns products" do
+                expect(products_controller.show[:body]).to eq(expected_result)
+              end
+
+              it "returns ok status" do
+                expect(products_controller.show[:status]).to eq(:ok)
+              end
             end
 
-            let(:query_parameters) do
-              {
-                nested_fields_select: "establishment"
-              }
-            end
+            context "when nested_field does not have value associated" do
+              let(:controller_params) do
+                {
+                  id: establishment.id
+                }
+              end
 
-            let(:expected_result) do
-              {
-                id: product_a.id,
-                name: "Bar",
-                code: "ABC",
-                establishment_id: establishment.id,
-                created_at: "2025-05-12T00:00:00.000Z",
-                updated_at: "2025-05-12T00:00:00.000Z",
-                establishment: {
+              let(:query_parameters) do
+                {
+                  nested_fields_select: "setting"
+                }
+              end
+
+              let(:expected_result) do
+                {
                   id: establishment.id,
                   name: "Foo",
+                  setting_id: nil,
                   created_at: "2025-05-12T00:00:00.000Z",
                   updated_at: "2025-05-12T00:00:00.000Z"
-                }
-              }.as_json
-            end
+                }.as_json
+              end
 
-            it "returns products" do
-              expect(products_controller.show[:body]).to eq(expected_result)
-            end
+              it "returns products" do
+                expect(establishments_controller.show[:body]).to eq(expected_result)
+              end
 
-            it "returns ok status" do
-              expect(products_controller.show[:status]).to eq(:ok)
+              it "returns ok status" do
+                expect(establishments_controller.show[:status]).to eq(:ok)
+              end
             end
           end
 

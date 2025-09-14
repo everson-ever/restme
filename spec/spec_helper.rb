@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "restme"
+require "amazing_print"
 require "byebug"
 require "database_cleaner/active_record"
 require "ostruct"
@@ -10,9 +11,13 @@ require "dotenv/load"
 require_relative "support/database"
 require_relative "support/controllers/products_controller"
 require_relative "support/controllers/establishments_controller"
+require_relative "support/controllers/settings_controller"
 require_relative "support/rules/products_controller/authorize_rules"
 require_relative "support/rules/products_controller/scope_rules"
 require_relative "support/rules/products_controller/field_rules"
+require_relative "support/rules/establishments_controller/authorize_rules"
+require_relative "support/rules/establishments_controller/scope_rules"
+require_relative "support/rules/establishments_controller/field_rules"
 require_relative "support/request_mock"
 
 RSpec.configure do |config|
