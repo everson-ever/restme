@@ -41,16 +41,10 @@ module Restme
           @model_attributes ||= klass.new.attributes.keys
         end
 
-        def nested_fields_joins
-          @nested_fields_joins ||= valid_nested_fields_select.select do |field|
-            nested_selectable_fields_keys[field.to_sym][:join_type].blank?
-          end
-        end
-
         def valid_nested_fields_select
           @valid_nested_fields_select ||=
             nested_fields_select&.split(",")&.select do |field|
-              nested_selectable_fields_keys[field.to_sym].present?
+              nested_selectable_fields_keys.key?(field.to_sym)
             end&.map(&:to_sym)
         end
 
