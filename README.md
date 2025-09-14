@@ -8,12 +8,15 @@ This gem manages your controller's responsibilities for:
 - Read Actions: Provide complete pagination, filtering, sorting, and field selection for records, all handled through query parameters (e.g., `http://127.0.0.1/products?name_equal=foo`).
 - Create/Update Actions: Enabling automatic creation and updating of records.
 
+## ℹ️ This doc reference latest version of Restme
+
+
 ## Installation
 
 
 GEMFILE:
 ```bash
-gem 'restme', '~> 1.1'
+gem 'restme', '~> 1.2'
 ```
 
 INSTALL:
@@ -207,19 +210,10 @@ This rule defines which nested_fields are selectable (nested fields are model re
 module ProductsController::Field
   class Rules
     NESTED_SELECTABLE_FIELDS = {
-      unit: {
-        table_name: :units
-      },
-      establishment: {
-        table_name: :establishments
-      },
-      category: {
-        table_name: :categories
-      },
-      producer: { # When a nested field can be nil, Restme will not return the primary model unless a LEFT JOIN is explicitly used.
-        table_name: :producers,
-        join_type: :left_joins  # Use that so Restme will generate a LEFT JOIN instead of an INNER JOIN. This will
-      }
+      unit: {},
+      establishment: {},
+      category: {},
+      producer: {}
     }.freeze
   end
 end
@@ -364,6 +358,15 @@ Example:
 
 ```bash
 http://localhost:3000/api/v1/products?attachment_fields_select=image
+
+{
+  "products": [
+    {
+      "id": 1,
+      "image_url": "http://localhost/image.png", // The field includes the `_url` suffix
+    }
+  ]
+}
 ```
 
 <br><br>
