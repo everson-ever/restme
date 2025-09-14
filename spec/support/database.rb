@@ -41,8 +41,10 @@ ActiveRecord::Schema.define do
     t.integer :establishment_id
     t.timestamps
   end
+
   create_table :establishments, force: true do |t|
     t.string :name
+    t.integer :setting_id
     t.timestamps
   end
 
@@ -50,6 +52,11 @@ ActiveRecord::Schema.define do
     t.string :name
     t.string :role
     t.string :user_role
+    t.timestamps
+  end
+
+  create_table :settings, force: true do |t|
+    t.string :name
     t.timestamps
   end
 end
@@ -62,7 +69,14 @@ class Product < ActiveRecord::Base
   belongs_to :establishment
 end
 
-class Establishment < ActiveRecord::Base; end
+class Establishment < ActiveRecord::Base
+  has_many :products
+  belongs_to :setting, optional: true
+end
+
+class Setting < ActiveRecord::Base
+  has_one :establishment
+end
 
 class User < ActiveRecord::Base
 end

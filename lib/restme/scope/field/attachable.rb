@@ -8,17 +8,33 @@ module Restme
         def insert_attachments(scope)
           unallowed_attachment_fields_error
 
-          return scope.uniq if attachment_fields_select.blank?
+          return scope.as_json(json_options) if attachment_fields_select.blank?
 
-          scope = scope.includes(attachment_fields_select_includes).uniq
+          define_attachment_methods
 
-          scope.map do |record|
-            attachment_fields_select.each do |field|
-              @record = record.as_json.merge({ "#{field}": record.send(field).url })
+          scope.includes(attachment_fields_select_includes)
+               .as_json(json_options)
+        end
+
+        def json_options
+          {
+            include: valid_nested_fields_select,
+            methods: attachment_methods
+          }
+        end
+
+        def define_attachment_methods
+          attachment_fields_select.each do |attachment_field_name|
+            klass.class_eval do
+              define_method(:"#{attachment_field_name}_url") do
+                send(attachment_field_name).url
+              end
             end
-
-            @record
           end
+        end
+
+        def attachment_methods
+          attachment_fields_select&.map { |field| "#{field}_url" }
         end
 
         def attachment_fields_select_includes

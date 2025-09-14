@@ -22,21 +22,11 @@ module Restme
         end
 
         def select_nested_scope(scoped)
-          scoped.joins(nested_fields_joins)
-                .left_joins(nested_fields_left_joins)
-                .preload(valid_nested_fields_select)
-                .select(nesteds_table)
+          scoped.preload(valid_nested_fields_select)
         end
 
         def select_any_field?
           fields_select || nested_fields_select || attachment_fields_select
-        end
-
-        def nesteds_table
-          valid_nested_fields_select&.map do |field|
-            table = nested_selectable_fields_keys.dig(field, :table_name)
-            table.present? ? "#{table}::text AS #{field}" : nil
-          end
         end
 
         def model_fields_select
@@ -54,12 +44,6 @@ module Restme
         def nested_fields_joins
           @nested_fields_joins ||= valid_nested_fields_select.select do |field|
             nested_selectable_fields_keys[field.to_sym][:join_type].blank?
-          end
-        end
-
-        def nested_fields_left_joins
-          @nested_fields_left_joins ||= valid_nested_fields_select.select do |field|
-            nested_selectable_fields_keys[field.to_sym][:join_type] == :left_joins
           end
         end
 
