@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    restme (1.1.2)
+    restme (1.1.1)
 
 GEM
   remote: https://rubygems.org/
@@ -22,21 +22,12 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activejob (8.0.2.1)
-      activesupport (= 8.0.2.1)
-      globalid (>= 0.3.6)
     activemodel (8.0.2.1)
       activesupport (= 8.0.2.1)
     activerecord (8.0.2.1)
       activemodel (= 8.0.2.1)
       activesupport (= 8.0.2.1)
       timeout (>= 0.4.0)
-    activestorage (8.0.2.1)
-      actionpack (= 8.0.2.1)
-      activejob (= 8.0.2.1)
-      activerecord (= 8.0.2.1)
-      activesupport (= 8.0.2.1)
-      marcel (~> 1.0)
     activesupport (8.0.2.1)
       base64
       benchmark (>= 0.3)
@@ -69,8 +60,6 @@ GEM
     dotenv (3.1.8)
     drb (2.2.1)
     erubi (1.13.1)
-    globalid (1.2.1)
-      activesupport (>= 6.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.0)
@@ -85,7 +74,6 @@ GEM
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    marcel (1.0.4)
     mini_portile2 (2.8.9)
     minitest (5.25.5)
     nokogiri (1.18.8)
@@ -215,7 +203,6 @@ PLATFORMS
 DEPENDENCIES
   actionpack
   activerecord
-  activestorage
   amazing_print (~> 1.6.0)
   byebug
   database_cleaner-active_record
