@@ -22,11 +22,18 @@ module Restme
       include ::Restme::Shared::CurrentModel
       include ::Restme::Shared::RestmeCurrentUserRole
 
-      attr_reader :filtered_scope, :sorted_scope, :paginated_scope, :fieldated_scope
+      attr_reader :sortable_scope_response, :paginable_scope_response
       attr_writer :restme_scope_errors, :restme_scope_status
 
+      SCOPE_ERROR_METHODS = %i[
+        per_page_errors
+        unknown_sortable_fields_errors
+        unallowed_filter_fields_errors
+        unallowed_select_fields_errors
+      ].freeze
+
       def pagination_response
-        @pagination_response ||= restme_response
+        @pagination_response ||= restme_pagination_response
       end
 
       def model_scope_object
@@ -39,7 +46,7 @@ module Restme
 
       private
 
-      def restme_response
+      def restme_pagination_response
         any_scope_errors
 
         restme_scope_errors.presence || {
@@ -49,10 +56,7 @@ module Restme
       end
 
       def any_scope_errors
-        per_page_errors
-        unknown_sortable_fields_errors
-        unallowed_filter_fields_errors
-        unallowed_select_fields_errors
+        SCOPE_ERROR_METHODS.each { |m| send(m) }
 
         restme_scope_errors
       end
@@ -64,8 +68,8 @@ module Restme
       def pagination
         {
           page: page_no,
-          pages: pages(filtered_scope),
-          total_items: total_items(filtered_scope)
+          pages: pages(filterable_scope_response),
+          total_items: total_items(filterable_scope_response)
         }
       end
 
@@ -80,10 +84,16 @@ module Restme
       end
 
       def custom_scope
-        @filtered_scope = filterable_scope(user_scope)
-        @sorted_scope = sortable_scope(filtered_scope)
-        @paginated_scope = paginable_scope(sorted_scope)
-        @fieldated_scope = fieldable_scope(paginated_scope)
+        return filterable_scope_response if filterable_scope_response.blank?
+
+        @sortable_scope_response = sortable_scope(filterable_scope_response)
+        @paginable_scope_response = paginable_scope(sortable_scope_response)
+
+        fieldable_scope(paginable_scope_response)
+      end
+
+      def filterable_scope_response
+        @filterable_scope_response ||= filterable_scope(user_scope)
       end
 
       def user_scope
