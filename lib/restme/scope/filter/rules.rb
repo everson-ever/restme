@@ -39,7 +39,7 @@ module Restme
           @user_scope = user_scope
 
           return user_scope unless filterable_scope?
-          return user_scope if record_not_found_errors
+          return none_scope if record_not_found_errors
 
           processed_scope
         end
