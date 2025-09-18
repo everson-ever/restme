@@ -9,6 +9,7 @@ require "timecop"
 require "dotenv/load"
 
 require_relative "support/database"
+require_relative "support/matchers/execute_queries_matcher"
 require_relative "support/controllers/products_controller"
 require_relative "support/controllers/establishments_controller"
 require_relative "support/controllers/settings_controller"
