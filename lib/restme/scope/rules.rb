@@ -22,7 +22,7 @@ module Restme
       include ::Restme::Shared::CurrentModel
       include ::Restme::Shared::RestmeCurrentUserRole
 
-      attr_reader :sortable_scope_response, :paginable_scope_response
+      attr_reader :filterable_scope_response
       attr_writer :restme_scope_errors, :restme_scope_status
 
       SCOPE_ERROR_METHODS = %i[
@@ -84,16 +84,12 @@ module Restme
       end
 
       def custom_scope
-        return filterable_scope_response if filterable_scope_response.blank?
+        @filterable_scope_response = filterable_scope(user_scope)
 
-        @sortable_scope_response = sortable_scope(filterable_scope_response)
-        @paginable_scope_response = paginable_scope(sortable_scope_response)
+        scope = sortable_scope(filterable_scope_response)
+        scope = paginable_scope(scope)
 
-        fieldable_scope(paginable_scope_response)
-      end
-
-      def filterable_scope_response
-        @filterable_scope_response ||= filterable_scope(user_scope)
+        fieldable_scope(scope)
       end
 
       def user_scope
