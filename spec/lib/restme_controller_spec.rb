@@ -568,6 +568,17 @@ RSpec.describe "RestmeController", type: :controller do
               }.as_json
             end
 
+            let(:expected_queries) do
+              [
+                "SELECT \"establishments\".\"id\", \"establishments\".\"name\", \"establishments\".\"setting_id\", " \
+                "\"establishments\".\"created_at\", \"establishments\".\"updated_at\" FROM \"establishments\" " \
+                "ORDER BY \"establishments\".\"id\" ASC LIMIT $1 OFFSET $2",
+                "SELECT \"settings\".* FROM \"settings\" WHERE \"settings\".\"id\" = $1",
+                "SELECT \"products\".* FROM \"products\" WHERE \"products\".\"establishment_id\" IN ($1, $2)",
+                "SELECT COUNT(*) FROM \"establishments\""
+              ]
+            end
+
             before do
               product_a
               product_b
@@ -582,7 +593,33 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             it "returns ok status" do
-              expect(establishments_controller.show[:status]).to eq(:ok)
+              expect(establishments_controller.index[:status]).to eq(:ok)
+            end
+
+            it do
+              expect { establishments_controller.index }.to execute_queries(expected_queries)
+            end
+          end
+
+          context "when select nested_field without select foreign key" do
+            let(:query_parameters) do
+              {
+                fields_select: "id",
+                nested_fields_select: "establishment",
+                id_sort: :asc
+              }
+            end
+
+            let(:expected_result) do
+              [{ body: "products.id", message: "missing attribute 'establishment_id' for Product" }]
+            end
+
+            it "returns products" do
+              expect(products_controller.index[:body]).to eq(expected_result.as_json)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.index[:status]).to eq(:bad_request)
             end
           end
         end
@@ -1655,6 +1692,33 @@ RSpec.describe "RestmeController", type: :controller do
 
               it "returns ok status" do
                 expect(establishments_controller.show[:status]).to eq(:ok)
+              end
+            end
+
+            context "when select nested_field without select foreign key" do
+              let(:controller_params) do
+                {
+                  id: product_a.id
+                }
+              end
+
+              let(:query_parameters) do
+                {
+                  fields_select: "id",
+                  nested_fields_select: "establishment"
+                }
+              end
+
+              let(:expected_result) do
+                [{ body: "products.id", message: "missing attribute 'establishment_id' for Product" }]
+              end
+
+              it "returns products" do
+                expect(products_controller.show[:body]).to eq(expected_result.as_json)
+              end
+
+              it "returns ok status" do
+                expect(products_controller.show[:status]).to eq(:bad_request)
               end
             end
           end
