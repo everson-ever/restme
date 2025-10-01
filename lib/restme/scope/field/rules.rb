@@ -19,6 +19,10 @@ module Restme
           scoped = select_nested_scope(scoped) if valid_nested_fields_select
 
           insert_attachments(scoped)
+        rescue ActiveModel::MissingAttributeError => e
+          restme_scope_errors({ body: model_fields_select, message: e.message })
+
+          restme_scope_status(:bad_request)
         end
 
         def select_nested_scope(scoped)
