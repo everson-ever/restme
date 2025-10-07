@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../shared/restme_current_user_role"
+require_relative "../shared/restme_current_user_roles"
 require_relative "../shared/current_model"
 require_relative "../shared/controller_params"
 
@@ -10,7 +10,7 @@ module Restme
     module Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel
-      include ::Restme::Shared::RestmeCurrentUserRole
+      include ::Restme::Shared::RestmeCurrentUserRoles
 
       attr_reader :create_temp_record
 
@@ -64,9 +64,13 @@ module Restme
       def createable_scope?
         return true unless restme_current_user
 
-        method_scope = "#{creatable_current_action}_#{restme_current_user_role}_scope?"
+        restme_methods_scopes.any? { |method_scope| create_rules_class.try(method_scope) }
+      end
 
-        create_rules_class.try(method_scope) || false
+      def restme_methods_scopes
+        @restme_methods_scopes ||= restme_current_user_roles.map do |restme_role|
+          "#{creatable_current_action}_#{restme_role}_scope?"
+        end
       end
 
       def createable_object_errors_messages

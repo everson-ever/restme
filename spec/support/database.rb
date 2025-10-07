@@ -79,4 +79,5 @@ class Setting < ActiveRecord::Base
 end
 
 class User < ActiveRecord::Base
+  attr_accessor :roles
 end

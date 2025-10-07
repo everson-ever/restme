@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../shared/restme_current_user_role"
+require_relative "../shared/restme_current_user_roles"
 require_relative "../shared/current_model"
 require_relative "../shared/controller_params"
 require_relative "filter/rules"
@@ -20,7 +20,7 @@ module Restme
       include ::Restme::Scope::Filter::Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel
-      include ::Restme::Shared::RestmeCurrentUserRole
+      include ::Restme::Shared::RestmeCurrentUserRoles
 
       attr_reader :filterable_scope_response
       attr_writer :restme_scope_errors, :restme_scope_status
@@ -99,7 +99,11 @@ module Restme
       end
 
       def user_scope
-        @user_scope ||= none_user_scope || scope_rules_class.try(method_scope) || none_scope
+        @user_scope ||= none_user_scope || scope_rules_class.try(scope_method.to_s) || none_scope
+      end
+
+      def scope_method
+        restme_methods_scopes.find { |method_scope| scope_rules_class.try(method_scope) }
       end
 
       def none_user_scope
@@ -110,8 +114,10 @@ module Restme
         klass.none
       end
 
-      def method_scope
-        "#{restme_current_user_role}_scope"
+      def restme_methods_scopes
+        @restme_methods_scopes ||= restme_current_user_roles.map do |restme_role|
+          "#{restme_role}_scope"
+        end
       end
 
       def scope_rules_class
