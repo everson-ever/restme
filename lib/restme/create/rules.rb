@@ -34,7 +34,7 @@ module Restme
       end
 
       def restme_create_status
-        return :unprocessable_entity if create_record_errors
+        return :unprocessable_content if create_record_errors
 
         :created
       end
@@ -64,11 +64,11 @@ module Restme
       def createable_scope?
         return true unless restme_current_user
 
-        restme_methods_scopes.any? { |method_scope| create_rules_class.try(method_scope) }
+        restme_create_methods_scopes.any? { |method_scope| create_rules_class.try(method_scope) }
       end
 
-      def restme_methods_scopes
-        @restme_methods_scopes ||= restme_current_user_roles.map do |restme_role|
+      def restme_create_methods_scopes
+        @restme_create_methods_scopes ||= restme_current_user_roles.map do |restme_role|
           "#{creatable_current_action}_#{restme_role}_scope?"
         end
       end
@@ -82,7 +82,7 @@ module Restme
       end
 
       def creatable_current_action
-        return true unless restme_current_user
+        return unless create_rules_class
 
         current_action.presence_in create_rules_class.class::CREATABLE_ACTIONS_RULES
       rescue StandardError

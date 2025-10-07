@@ -36,7 +36,7 @@ module Restme
       end
 
       def restme_update_status
-        return :unprocessable_entity if update_record_errors
+        return :unprocessable_content if update_record_errors
 
         :ok
       end
@@ -74,11 +74,11 @@ module Restme
       def updateable_scope?
         return true unless restme_current_user
 
-        restme_methods_scopes.any? { |method_scope| update_rules_class.try(method_scope) }
+        restme_update_methods_scopes.any? { |method_scope| update_rules_class.try(method_scope) }
       end
 
-      def restme_methods_scopes
-        @restme_methods_scopes ||= restme_current_user_roles.map do |restme_role|
+      def restme_update_methods_scopes
+        @restme_update_methods_scopes ||= restme_current_user_roles.map do |restme_role|
           "#{updateable_current_action}_#{restme_role}_scope?"
         end
       end
@@ -92,7 +92,7 @@ module Restme
       end
 
       def updateable_current_action
-        return true unless restme_current_user
+        return unless update_rules_class
 
         current_action.presence_in update_rules_class.class::UPDATABLE_ACTIONS_RULES
       rescue StandardError
