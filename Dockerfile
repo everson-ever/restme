@@ -15,6 +15,8 @@ RUN mkdir -p $APP_HOME
 WORKDIR $APP_HOME
 
 ADD Gemfile* $APP_HOME/
+ADD restme.gemspec $APP_HOME/
+ADD lib/restme/version.rb $APP_HOME/lib/restme/version.rb
 
 RUN chown -R $(whoami):$(whoami) $APP_HOME
 
