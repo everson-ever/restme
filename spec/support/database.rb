@@ -52,6 +52,7 @@ ActiveRecord::Schema.define do
     t.string :name
     t.string :role
     t.string :user_role
+    t.integer :establishment_id
     t.timestamps
   end
 

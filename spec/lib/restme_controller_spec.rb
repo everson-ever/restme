@@ -31,7 +31,7 @@ RSpec.describe "RestmeController", type: :controller do
   end
 
   let(:current_user) do
-    User.create(name: "Restme", role: user_role, user_role: user_role)
+    User.create(name: "Restme", role: user_role, user_role: user_role, establishment_id: establishment.id)
   end
 
   let(:user_role) { :client }
@@ -41,8 +41,10 @@ RSpec.describe "RestmeController", type: :controller do
   let(:product_a) { Product.create(name: "Bar", code: "ABC", establishment_id: establishment.id) }
   let(:product_b) { Product.create(name: "Foo", code: "DEF", establishment_id: establishment.id) }
   let(:product_c) { Product.create(name: "BarBar", code: "GHI", establishment_id: establishment.id) }
+  let(:product_d) { Product.create(name: "FooFoo", code: "JKL", establishment_id: establishment2.id) }
 
   let(:establishment) { Establishment.create(name: "Foo") }
+  let(:establishment2) { Establishment.create(name: "Bar") }
 
   describe "restme config" do
     context "with current_user_variable" do
@@ -250,15 +252,37 @@ RSpec.describe "RestmeController", type: :controller do
         context "when authorize rules class exists" do
           context "when user can access controller action" do
             before do
-              current_user.roles = %w[client super_admin]
+              product_a
+              product_b
+              product_c
+              product_d
             end
 
-            context "when is super_admin" do
-              let(:expected_result) do
-                { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+            let(:query_parameters) do
+              {
+                fields_select: "id",
+                id_sort: :asc
+              }
+            end
+
+            context "when is manager/super_admin" do
+              before do
+                current_user.roles = %w[manager super_admin]
               end
 
-              it "rreturns success response" do
+              let(:expected_result) do
+                {
+                  objects: [
+                    { id: product_a.id },
+                    { id: product_b.id },
+                    { id: product_c.id },
+                    { id: product_d.id }
+                  ],
+                  pagination: { page: 1, pages: 1, total_items: 4 }
+                }.as_json
+              end
+
+              it "returns success response" do
                 expect(products_controller.index[:body]).to eq(expected_result)
               end
 
@@ -268,8 +292,19 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             context "when is other authorized user" do
+              before do
+                current_user.roles = %w[manager]
+              end
+
               let(:expected_result) do
-                { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+                {
+                  objects: [
+                    { id: product_a.id },
+                    { id: product_b.id },
+                    { id: product_c.id }
+                  ],
+                  pagination: { page: 1, pages: 1, total_items: 3 }
+                }.as_json
               end
 
               it "returns success response" do

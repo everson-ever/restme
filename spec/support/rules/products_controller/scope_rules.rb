@@ -14,7 +14,7 @@ class ProductsController
       end
 
       def manager_scope
-        @klass.all
+        @klass.where(establishment_id: @current_user.establishment_id)
       end
 
       def super_admin_scope
