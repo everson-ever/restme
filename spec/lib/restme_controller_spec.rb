@@ -640,12 +640,13 @@ RSpec.describe "RestmeController", type: :controller do
 
             let(:expected_queries) do
               [
-                "SELECT \"establishments\".\"id\", \"establishments\".\"name\", \"establishments\".\"setting_id\", " \
+                "SELECT DISTINCT \"establishments\".\"id\", \"establishments\".\"name\", " \
+                "\"establishments\".\"setting_id\", " \
                 "\"establishments\".\"created_at\", \"establishments\".\"updated_at\" FROM \"establishments\" " \
                 "ORDER BY \"establishments\".\"id\" ASC LIMIT $1 OFFSET $2",
                 "SELECT \"settings\".* FROM \"settings\" WHERE \"settings\".\"id\" = $1",
                 "SELECT \"products\".* FROM \"products\" WHERE \"products\".\"establishment_id\" IN ($1, $2)",
-                "SELECT COUNT(*) FROM \"establishments\""
+                "SELECT COUNT(DISTINCT \"establishments\".\"id\") FROM \"establishments\""
               ]
             end
 
@@ -946,7 +947,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   name_like: product_a.name,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1130,7 +1132,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   id_bigger_than: 0,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 

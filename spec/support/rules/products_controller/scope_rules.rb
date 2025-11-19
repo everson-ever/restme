@@ -16,6 +16,10 @@ class ProductsController
       def manager_scope
         @klass.all
       end
+
+      def super_admin_scope
+        @klass.all
+      end
     end
   end
 end
