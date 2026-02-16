@@ -282,12 +282,23 @@ RSpec.describe "RestmeController", type: :controller do
                 }.as_json
               end
 
+              let(:expected_queries) do
+                [
+                  "SELECT DISTINCT \"products\".\"id\" FROM \"products\" ORDER BY \"products\".\"id\" " \
+                  "ASC LIMIT $1 OFFSET $2", "SELECT COUNT(DISTINCT \"products\".\"id\") FROM \"products\""
+                ]
+              end
+
               it "returns success response" do
                 expect(products_controller.index[:body]).to eq(expected_result)
               end
 
               it "returns success status" do
                 expect(products_controller.index[:status]).to eq(:ok)
+              end
+
+              it do
+                expect { products_controller.index }.to execute_queries(expected_queries)
               end
             end
 
@@ -675,13 +686,13 @@ RSpec.describe "RestmeController", type: :controller do
 
             let(:expected_queries) do
               [
-                "SELECT DISTINCT \"establishments\".\"id\", \"establishments\".\"name\", " \
+                "SELECT \"establishments\".\"id\", \"establishments\".\"name\", " \
                 "\"establishments\".\"setting_id\", " \
                 "\"establishments\".\"created_at\", \"establishments\".\"updated_at\" FROM \"establishments\" " \
                 "ORDER BY \"establishments\".\"id\" ASC LIMIT $1 OFFSET $2",
                 "SELECT \"settings\".* FROM \"settings\" WHERE \"settings\".\"id\" = $1",
                 "SELECT \"products\".* FROM \"products\" WHERE \"products\".\"establishment_id\" IN ($1, $2)",
-                "SELECT COUNT(DISTINCT \"establishments\".\"id\") FROM \"establishments\""
+                "SELECT COUNT(*) FROM \"establishments\""
               ]
             end
 

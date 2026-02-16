@@ -105,13 +105,16 @@ module Restme
       def process_user_scope
         scopes = user_scope_methods.map { |m| scope_rules_class.try(m) }
 
-        scopes.reduce { |combined, s| combined.or(s) }&.distinct
+        processed_scope = scopes.reduce { |combined, s| combined.or(s) }
+
+        user_scope_methods.many? ? processed_scope&.distinct : processed_scope
       end
 
       def user_scope_methods
-        restme_methods_scopes.select do |method_scope|
-          scope_rules_class.respond_to?(method_scope)
-        end
+        @user_scope_methods ||=
+          restme_methods_scopes.select do |method_scope|
+            scope_rules_class.respond_to?(method_scope)
+          end
       end
 
       def none_user_scope
