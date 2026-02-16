@@ -448,6 +448,17 @@ RSpec.describe "RestmeController", type: :controller do
       context "with field selections" do
         context "with fields_select" do
           context "when passed fields are allowed to select" do
+            before do
+              ProductsController::Field::Rules.const_set(
+                :MODEL_FIELDS_SELECT,
+                %i[id establishment_id]
+              )
+            end
+
+            after do
+              ProductsController::Field::Rules.send(:remove_const, :MODEL_FIELDS_SELECT)
+            end
+
             let(:query_parameters) do
               {
                 fields_select: "id,name",
@@ -460,11 +471,13 @@ RSpec.describe "RestmeController", type: :controller do
                 objects: [
                   {
                     id: product_a.id,
-                    name: "Bar"
+                    name: "Bar",
+                    establishment_id: establishment.id
                   },
                   {
                     id: product_b.id,
-                    name: "Foo"
+                    name: "Foo",
+                    establishment_id: establishment.id
                   }
                 ],
                 pagination: { page: 1, pages: 1, total_items: 2 }
@@ -498,6 +511,60 @@ RSpec.describe "RestmeController", type: :controller do
             it "returns ok status" do
               expect(products_controller.index[:status]).to eq(:bad_request)
             end
+          end
+        end
+
+        context "with defined_fields_select" do
+          before do
+            ProductsController::Field::Rules.const_set(
+              :MODEL_FIELDS_SELECT,
+              %i[id establishment_id]
+            )
+          end
+
+          after do
+            ProductsController::Field::Rules.send(:remove_const, :MODEL_FIELDS_SELECT)
+          end
+
+          let(:query_parameters) do
+            {
+              nested_fields_select: "establishment",
+              id_sort: :asc
+            }
+          end
+
+          let(:expected_result) do
+            {
+              objects: [
+                {
+                  id: product_a.id,
+                  establishment_id: establishment.id,
+                  establishment: {
+                    id: establishment.id,
+                    name: "Foo",
+                    setting_id: nil,
+                    created_at: "2025-05-12T00:00:00.000Z",
+                    updated_at: "2025-05-12T00:00:00.000Z"
+                  }
+                },
+                {
+                  id: product_b.id,
+                  establishment_id: establishment.id,
+                  establishment: {
+                    id: establishment.id,
+                    name: "Foo",
+                    setting_id: nil,
+                    created_at: "2025-05-12T00:00:00.000Z",
+                    updated_at: "2025-05-12T00:00:00.000Z"
+                  }
+                }
+              ],
+              pagination: { page: 1, pages: 1, total_items: 2 }
+            }.as_json
+          end
+
+          it "returns products" do
+            expect(products_controller.index[:body]).to eq(expected_result)
           end
         end
 

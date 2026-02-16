@@ -30,19 +30,29 @@ module Restme
         end
 
         def select_any_field?
-          fields_select || nested_fields_select || attachment_fields_select
+          defined_fields_select || fields_select || nested_fields_select || attachment_fields_select
         end
 
         def model_fields_select
-          @model_fields_select ||= begin
-            fields = fields_select&.split(",")
-            fields = fields&.map { |field| "#{klass.table_name}.#{field}" }&.join(",")
-            fields || model_attributes
+          @model_fields_select ||= select_selected_fields.presence || model_attributes
+        end
+
+        def select_selected_fields
+          @select_selected_fields ||= begin
+            fields = defined_fields_select | fields_select.split(",")
+
+            fields.map { |field| "#{klass.table_name}.#{field}" }.join(",")
           end
         end
 
         def model_attributes
-          @model_attributes ||= klass.new.attributes.keys
+          @model_attributes ||= klass.attribute_names
+        end
+
+        def defined_fields_select
+          return [] unless field_class_rules&.const_defined?(:MODEL_FIELDS_SELECT)
+
+          field_class_rules::MODEL_FIELDS_SELECT || []
         end
 
         def valid_nested_fields_select
@@ -79,7 +89,7 @@ module Restme
         end
 
         def fields_select
-          @fields_select ||= controller_query_params[:fields_select]
+          @fields_select ||= controller_query_params[:fields_select] || ""
         end
 
         def nested_fields_select
