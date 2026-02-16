@@ -31,7 +31,7 @@ RSpec.describe "RestmeController", type: :controller do
   end
 
   let(:current_user) do
-    User.create(name: "Restme", role: user_role, user_role: user_role)
+    User.create(name: "Restme", role: user_role, user_role: user_role, establishment_id: establishment.id)
   end
 
   let(:user_role) { :client }
@@ -41,8 +41,10 @@ RSpec.describe "RestmeController", type: :controller do
   let(:product_a) { Product.create(name: "Bar", code: "ABC", establishment_id: establishment.id) }
   let(:product_b) { Product.create(name: "Foo", code: "DEF", establishment_id: establishment.id) }
   let(:product_c) { Product.create(name: "BarBar", code: "GHI", establishment_id: establishment.id) }
+  let(:product_d) { Product.create(name: "FooFoo", code: "JKL", establishment_id: establishment2.id) }
 
   let(:establishment) { Establishment.create(name: "Foo") }
+  let(:establishment2) { Establishment.create(name: "Bar") }
 
   describe "restme config" do
     context "with current_user_variable" do
@@ -182,52 +184,166 @@ RSpec.describe "RestmeController", type: :controller do
 
   describe "authorize rules" do
     context "when controller have current_user" do
-      context "when authorize rules class exists" do
-        context "when user can access controller action" do
-          context "when is super_admin" do
-            let(:user_role) { :super_admin }
+      context "when user_role_field is a single string" do
+        context "when authorize rules class exists" do
+          context "when user can access controller action" do
+            context "when is super_admin" do
+              let(:user_role) { :super_admin }
 
-            let(:expected_result) do
-              { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+              let(:expected_result) do
+                { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+              end
+
+              it "rreturns success response" do
+                expect(products_controller.index[:body]).to eq(expected_result)
+              end
+
+              it "returns success status" do
+                expect(products_controller.index[:status]).to eq(:ok)
+              end
             end
 
-            it "rreturns success response" do
-              expect(products_controller.index[:body]).to eq(expected_result)
-            end
+            context "when is other authorized user" do
+              let(:expected_result) do
+                { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+              end
 
-            it "returns success status" do
-              expect(products_controller.index[:status]).to eq(:ok)
+              it "returns success response" do
+                expect(products_controller.index[:body]).to eq(expected_result)
+              end
+
+              it "returns success status" do
+                expect(products_controller.index[:status]).to eq(:ok)
+              end
             end
           end
 
-          context "when is other authorized user" do
+          context "when user can not access controller action" do
+            let(:user_role) { :other_role }
+
             let(:expected_result) do
-              { objects: [], pagination: { page: 1, pages: 0, total_items: 0 } }.as_json
+              [{ body: {}, message: "Action not allowed" }].as_json
             end
 
-            it "returns success response" do
+            it "returns forbidden response" do
               expect(products_controller.index[:body]).to eq(expected_result)
             end
 
-            it "returns success status" do
-              expect(products_controller.index[:status]).to eq(:ok)
+            it "returns forbidden status" do
+              expect(products_controller.index[:status]).to eq(:forbidden)
             end
           end
         end
+      end
 
-        context "when user can not access controller action" do
-          let(:user_role) { :other_role }
+      context "when user_role_field is with multiple roles" do
+        before do
+          Restme.configure do |config|
+            config.user_role_field = :roles
+          end
+        end
 
-          let(:expected_result) do
-            [{ body: {}, message: "Action not allowed" }].as_json
+        after do
+          Restme.configure do |config|
+            config.user_role_field = :role
+          end
+        end
+
+        context "when authorize rules class exists" do
+          context "when user can access controller action" do
+            before do
+              product_a
+              product_b
+              product_c
+              product_d
+            end
+
+            let(:query_parameters) do
+              {
+                fields_select: "id",
+                id_sort: :asc
+              }
+            end
+
+            context "when is manager/super_admin" do
+              before do
+                current_user.roles = %w[manager super_admin]
+              end
+
+              let(:expected_result) do
+                {
+                  objects: [
+                    { id: product_a.id },
+                    { id: product_b.id },
+                    { id: product_c.id },
+                    { id: product_d.id }
+                  ],
+                  pagination: { page: 1, pages: 1, total_items: 4 }
+                }.as_json
+              end
+
+              let(:expected_queries) do
+                [
+                  "SELECT DISTINCT \"products\".\"id\" FROM \"products\" ORDER BY \"products\".\"id\" " \
+                  "ASC LIMIT $1 OFFSET $2", "SELECT COUNT(DISTINCT \"products\".\"id\") FROM \"products\""
+                ]
+              end
+
+              it "returns success response" do
+                expect(products_controller.index[:body]).to eq(expected_result)
+              end
+
+              it "returns success status" do
+                expect(products_controller.index[:status]).to eq(:ok)
+              end
+
+              it do
+                expect { products_controller.index }.to execute_queries(expected_queries)
+              end
+            end
+
+            context "when is other authorized user" do
+              before do
+                current_user.roles = %w[manager]
+              end
+
+              let(:expected_result) do
+                {
+                  objects: [
+                    { id: product_a.id },
+                    { id: product_b.id },
+                    { id: product_c.id }
+                  ],
+                  pagination: { page: 1, pages: 1, total_items: 3 }
+                }.as_json
+              end
+
+              it "returns success response" do
+                expect(products_controller.index[:body]).to eq(expected_result)
+              end
+
+              it "returns success status" do
+                expect(products_controller.index[:status]).to eq(:ok)
+              end
+            end
           end
 
-          it "returns forbidden response" do
-            expect(products_controller.index[:body]).to eq(expected_result)
-          end
+          context "when user can not access controller action" do
+            before do
+              current_user.roles = %i[moderator comum]
+            end
 
-          it "returns forbidden status" do
-            expect(products_controller.index[:status]).to eq(:forbidden)
+            let(:expected_result) do
+              [{ body: {}, message: "Action not allowed" }].as_json
+            end
+
+            it "returns forbidden response" do
+              expect(products_controller.index[:body]).to eq(expected_result)
+            end
+
+            it "returns forbidden status" do
+              expect(products_controller.index[:status]).to eq(:forbidden)
+            end
           end
         end
       end
@@ -570,7 +686,8 @@ RSpec.describe "RestmeController", type: :controller do
 
             let(:expected_queries) do
               [
-                "SELECT \"establishments\".\"id\", \"establishments\".\"name\", \"establishments\".\"setting_id\", " \
+                "SELECT \"establishments\".\"id\", \"establishments\".\"name\", " \
+                "\"establishments\".\"setting_id\", " \
                 "\"establishments\".\"created_at\", \"establishments\".\"updated_at\" FROM \"establishments\" " \
                 "ORDER BY \"establishments\".\"id\" ASC LIMIT $1 OFFSET $2",
                 "SELECT \"settings\".* FROM \"settings\" WHERE \"settings\".\"id\" = $1",
@@ -876,7 +993,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   name_like: product_a.name,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 
@@ -1060,7 +1178,8 @@ RSpec.describe "RestmeController", type: :controller do
               let(:query_parameters) do
                 {
                   id_bigger_than: 0,
-                  fields_select: "id,name"
+                  fields_select: "id,name",
+                  id_sort: :asc
                 }
               end
 

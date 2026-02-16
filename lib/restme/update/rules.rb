@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../shared/restme_current_user_role"
+require_relative "../shared/restme_current_user_roles"
 require_relative "../shared/current_model"
 require_relative "../shared/controller_params"
 
@@ -10,7 +10,7 @@ module Restme
     module Rules
       include ::Restme::Shared::ControllerParams
       include ::Restme::Shared::CurrentModel
-      include ::Restme::Shared::RestmeCurrentUserRole
+      include ::Restme::Shared::RestmeCurrentUserRoles
 
       attr_reader :update_temp_record
 
@@ -36,7 +36,7 @@ module Restme
       end
 
       def restme_update_status
-        return :unprocessable_entity if update_record_errors
+        return :unprocessable_content if update_record_errors
 
         :ok
       end
@@ -74,9 +74,13 @@ module Restme
       def updateable_scope?
         return true unless restme_current_user
 
-        method_scope = "#{updateable_current_action}_#{restme_current_user_role}_scope?"
+        restme_update_methods_scopes.any? { |method_scope| update_rules_class.try(method_scope) }
+      end
 
-        update_rules_class.try(method_scope) || false
+      def restme_update_methods_scopes
+        @restme_update_methods_scopes ||= restme_current_user_roles.map do |restme_role|
+          "#{updateable_current_action}_#{restme_role}_scope?"
+        end
       end
 
       def updateable_record_errors_messages
@@ -88,7 +92,7 @@ module Restme
       end
 
       def updateable_current_action
-        return true unless restme_current_user
+        return unless update_rules_class
 
         current_action.presence_in update_rules_class.class::UPDATABLE_ACTIONS_RULES
       rescue StandardError
