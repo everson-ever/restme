@@ -16,7 +16,7 @@ This gem manages your controller's responsibilities for:
 
 GEMFILE:
 ```bash
-gem 'restme', '~> 1.2.1'
+gem 'restme', '~> 1.3.0'
 ```
 
 INSTALL:
@@ -56,6 +56,31 @@ Restme.configure do |config|
   config.pagination_max_per_page = 100
 end
 ```
+
+`current_user_variable`
+
+Defines the name of the method used to access the currently authenticated user within the controller context.
+This should match the method that returns the logged-in user (for example, :current_user when using authentication libraries like Devise).
+Represent the the field where the role of user is (can be one or many rules)
+
+`user_role_field`
+
+Defines the attribute on the user model that represents the user's role.
+This field is used to determine authorization rules and may support single or multiple roles, depending on your application's implementation.
+
+`pagination_default_per_page`
+
+Specifies the default number of records returned per page when pagination parameters are not explicitly provided in the request.
+
+`pagination_default_page`
+
+Specifies the default page number used when the request does not include a page parameter.
+
+`pagination_max_per_page`
+
+Defines the maximum number of records allowed per page.
+This acts as a safety limit to prevent clients from requesting excessively large result sets, helping protect application performance and resource usage.
+
 
 <br>
 
@@ -209,6 +234,11 @@ This rule defines which nested_fields are selectable (nested fields are model re
 ```ruby
 module ProductsController::Field
   class Rules
+   # Defines the default fields that will be automatically selected
+   # in queries when no explicit field selection is provided.
+   # These fields are always included in the response.
+   MODEL_FIELDS_SELECT = %i[id].freeze
+
     NESTED_SELECTABLE_FIELDS = {
       unit: {},
       establishment: {},
@@ -287,8 +317,6 @@ Pagination functionality is available for any `index` endpoint that uses the `pa
 There are two query parameters available to control pagination:
 - `per_page`: Defines the number of items per page.
 - `page`: Sets the current page number.
-
-ℹ️ **Note:** The maximum number of items per page is currently limited to 100.
 
 Example usage:
 
