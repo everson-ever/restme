@@ -53,10 +53,9 @@ module Restme
         def unallowed_attachment_fields_error
           return if unallowed_attachment_fields.blank?
 
-          render json: {
-            body: unallowed_attachment_fields,
-            message: "Selected not allowed attachment fields"
-          }, status: :bad_request
+          restme_scope_errors({ body: unallowed_attachment_fields, message: "Selected not allowed attachment fields" })
+
+          restme_scope_status(:bad_request)
         end
 
         def unallowed_attachment_fields

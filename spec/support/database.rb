@@ -68,6 +68,10 @@ class Product < ActiveRecord::Base
   SORTABLE_FIELDS = %i[name created_at].freeze
 
   belongs_to :establishment
+
+  def self.attachment_reflections
+    []
+  end
 end
 
 class Establishment < ActiveRecord::Base
