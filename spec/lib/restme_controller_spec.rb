@@ -453,15 +453,21 @@ RSpec.describe "RestmeController", type: :controller do
                 :MODEL_FIELDS_SELECT,
                 %i[id establishment_id]
               )
+
+              ProductsController::Field::Rules.const_set(
+                :UNALLOWED_MODEL_FIELDS_SELECT,
+                %i[code]
+              )
             end
 
             after do
               ProductsController::Field::Rules.send(:remove_const, :MODEL_FIELDS_SELECT)
+              ProductsController::Field::Rules.send(:remove_const, :UNALLOWED_MODEL_FIELDS_SELECT)
             end
 
             let(:query_parameters) do
               {
-                fields_select: "id,name",
+                fields_select: "id,name,code",
                 id_sort: :asc
               }
             end
@@ -795,7 +801,7 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              [{ body: "products.id", message: "missing attribute 'establishment_id' for Product" }]
+              [{ body: ["id"], message: "missing attribute 'establishment_id' for Product" }]
             end
 
             it "returns products" do
@@ -1896,7 +1902,7 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                [{ body: "products.id", message: "missing attribute 'establishment_id' for Product" }]
+                [{ body: ["id"], message: "missing attribute 'establishment_id' for Product" }]
               end
 
               it "returns products" do
