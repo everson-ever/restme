@@ -329,13 +329,20 @@ http://localhost:3000/api/v1/products?per_page=12&page=1
 
 #### Field Selection (`fields_select`)
 
-You can select specific fields from your model, such as `id`, `name`, or `created_at`.  
-The resulting query will retrieve **only** the selected fields directly from the database, improving performance.
+You can select specific fields from your model, such as `id`, `name`, or `created_at`.
+The generated query will retrieve only the selected fields directly from the database, reducing unnecessary data loading and improving performance.
 
 Example:
 
 ```bash
 http://localhost:3000/api/v1/products?fields_select=id,name
+```
+
+If you need to prevent a specific field from being returned in the response — even when it is selected — simply override the as_json method in the corresponding model:
+```ruby
+def as_json(options = {})
+  super({ except: [:name] }.merge(options))
+end
 ```
 
 <br><br>
