@@ -28,7 +28,7 @@ gem 'restme'
 
 #### ℹ️ Current Version of gem require the following pré configs
  - Your controllers must be named using the plural form of the model (e.g., Product → ProductsController). Alternatively, you can manually set the model name by defining the MODEL_NAME constant (e.g., MODEL_NAME = "Product").
- - You must create a folder inside app named restfy to define controller rules for authorization, scoping, creation, updating, and field selection (see example below).
+ - You must create a folder inside app named restme to define controller rules for authorization, scoping, creation, updating, and field selection (see example below).
 
 
 <br>
