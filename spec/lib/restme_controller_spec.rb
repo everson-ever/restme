@@ -813,6 +813,28 @@ RSpec.describe "RestmeController", type: :controller do
             end
           end
         end
+
+        context "with attachment_fields_select" do
+          context "when have nested_fields not allowed to select" do
+            let(:query_parameters) do
+              {
+                attachment_fields_select: "file"
+              }
+            end
+
+            let(:expected_result) do
+              [{ body: ["file"], message: "Selected not allowed attachment fields" }]
+            end
+
+            it "returns products" do
+              expect(products_controller.index[:body]).to eq(expected_result.as_json)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.index[:status]).to eq(:bad_request)
+            end
+          end
+        end
       end
 
       context "with sort" do
