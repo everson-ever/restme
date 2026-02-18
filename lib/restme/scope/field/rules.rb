@@ -110,7 +110,7 @@ module Restme
         end
 
         def field_class_rules
-          "#{controller_class.to_s.split("::").last}::Field::Rules".constantize
+          "#{controller_class.to_s.split("::").last}::Field::Rules".safe_constantize
         end
       end
     end
