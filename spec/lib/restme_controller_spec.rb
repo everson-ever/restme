@@ -412,36 +412,76 @@ RSpec.describe "RestmeController", type: :controller do
       end
 
       context "when get products without any params" do
-        let(:expected_result) do
-          {
-            objects: [
-              {
-                id: product_a.id,
-                name: "Bar",
-                code: "ABC",
-                establishment_id: establishment.id,
-                created_at: "2025-05-12T00:00:00.000Z",
-                updated_at: "2025-05-12T00:00:00.000Z"
-              },
-              {
-                id: product_b.id,
-                name: "Foo",
-                code: "DEF",
-                establishment_id: establishment.id,
-                created_at: "2025-05-12T00:00:00.000Z",
-                updated_at: "2025-05-12T00:00:00.000Z"
-              }
-            ],
-            pagination: { page: 1, pages: 1, total_items: 2 }
-          }.as_json
+        context "when field class exists" do
+          let(:expected_result) do
+            {
+              objects: [
+                {
+                  id: product_a.id,
+                  name: "Bar",
+                  code: "ABC",
+                  establishment_id: establishment.id,
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z"
+                },
+                {
+                  id: product_b.id,
+                  name: "Foo",
+                  code: "DEF",
+                  establishment_id: establishment.id,
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z"
+                }
+              ],
+              pagination: { page: 1, pages: 1, total_items: 2 }
+            }.as_json
+          end
+
+          it "returns products" do
+            expect(products_controller.index[:body]).to eq(expected_result)
+          end
+
+          it "returns ok status" do
+            expect(products_controller.index[:status]).to eq(:ok)
+          end
         end
 
-        it "returns products" do
-          expect(products_controller.index[:body]).to eq(expected_result)
-        end
+        context "when field class does not exists" do
+          before do
+            hide_const("ProductsController::Field::Rules")
+          end
 
-        it "returns ok status" do
-          expect(products_controller.index[:status]).to eq(:ok)
+          let(:expected_result) do
+            {
+              objects: [
+                {
+                  id: product_a.id,
+                  name: "Bar",
+                  code: "ABC",
+                  establishment_id: establishment.id,
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z"
+                },
+                {
+                  id: product_b.id,
+                  name: "Foo",
+                  code: "DEF",
+                  establishment_id: establishment.id,
+                  created_at: "2025-05-12T00:00:00.000Z",
+                  updated_at: "2025-05-12T00:00:00.000Z"
+                }
+              ],
+              pagination: { page: 1, pages: 1, total_items: 2 }
+            }.as_json
+          end
+
+          it "returns products" do
+            expect(products_controller.index[:body]).to eq(expected_result)
+          end
+
+          it "returns ok status" do
+            expect(products_controller.index[:status]).to eq(:ok)
+          end
         end
       end
 
