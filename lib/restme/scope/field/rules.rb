@@ -34,10 +34,7 @@ module Restme
         end
 
         def model_fields_select
-          @model_fields_select ||= begin
-            fields = select_selected_fields.presence || model_attributes
-            fields - unallowed_model_fields_select
-          end
+          @model_fields_select ||= select_selected_fields.presence || model_attributes
         end
 
         def select_selected_fields
@@ -45,7 +42,7 @@ module Restme
         end
 
         def model_attributes
-          @model_attributes ||= klass.attribute_names
+          @model_attributes ||= klass.attribute_names - unallowed_model_fields_select
         end
 
         def defined_fields_select
