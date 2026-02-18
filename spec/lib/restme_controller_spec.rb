@@ -453,21 +453,15 @@ RSpec.describe "RestmeController", type: :controller do
                 :MODEL_FIELDS_SELECT,
                 %i[id establishment_id]
               )
-
-              ProductsController::Field::Rules.const_set(
-                :UNALLOWED_MODEL_FIELDS_SELECT,
-                %i[code]
-              )
             end
 
             after do
               ProductsController::Field::Rules.send(:remove_const, :MODEL_FIELDS_SELECT)
-              ProductsController::Field::Rules.send(:remove_const, :UNALLOWED_MODEL_FIELDS_SELECT)
             end
 
             let(:query_parameters) do
               {
-                fields_select: "id,name,code",
+                fields_select: "id,name",
                 id_sort: :asc
               }
             end
@@ -500,14 +494,25 @@ RSpec.describe "RestmeController", type: :controller do
           end
 
           context "when have fields not allowed to select" do
+            before do
+              ProductsController::Field::Rules.const_set(
+                :UNALLOWED_MODEL_FIELDS_SELECT,
+                %i[code]
+              )
+            end
+
+            after do
+              ProductsController::Field::Rules.send(:remove_const, :UNALLOWED_MODEL_FIELDS_SELECT)
+            end
+
             let(:query_parameters) do
               {
-                fields_select: "id,invalid_field"
+                fields_select: "id,code,invalid_field"
               }
             end
 
             let(:expected_result) do
-              [{ body: ["invalid_field"], message: "Selected not allowed fields" }]
+              [{ body: %w[code invalid_field], message: "Selected not allowed fields" }]
             end
 
             it "returns products" do
