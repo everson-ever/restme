@@ -239,6 +239,8 @@ module ProductsController::Field
    # These fields are always included in the response.
    MODEL_FIELDS_SELECT = %i[id].freeze
 
+   UNALLOWED_MODEL_FIELDS_SELECT = %i[internal_code].freeze
+
     NESTED_SELECTABLE_FIELDS = {
       unit: {},
       establishment: {},

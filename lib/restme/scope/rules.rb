@@ -30,6 +30,7 @@ module Restme
         unknown_sortable_fields_errors
         unallowed_filter_fields_errors
         unallowed_select_fields_errors
+        unallowed_attachment_fields_error
       ].freeze
 
       def pagination_response

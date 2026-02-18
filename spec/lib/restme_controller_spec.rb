@@ -494,14 +494,25 @@ RSpec.describe "RestmeController", type: :controller do
           end
 
           context "when have fields not allowed to select" do
+            before do
+              ProductsController::Field::Rules.const_set(
+                :UNALLOWED_MODEL_FIELDS_SELECT,
+                %i[code]
+              )
+            end
+
+            after do
+              ProductsController::Field::Rules.send(:remove_const, :UNALLOWED_MODEL_FIELDS_SELECT)
+            end
+
             let(:query_parameters) do
               {
-                fields_select: "id,invalid_field"
+                fields_select: "id,code,invalid_field"
               }
             end
 
             let(:expected_result) do
-              [{ body: ["invalid_field"], message: "Selected not allowed fields" }]
+              [{ body: %w[code invalid_field], message: "Selected not allowed fields" }]
             end
 
             it "returns products" do
@@ -795,7 +806,29 @@ RSpec.describe "RestmeController", type: :controller do
             end
 
             let(:expected_result) do
-              [{ body: "products.id", message: "missing attribute 'establishment_id' for Product" }]
+              [{ body: ["id"], message: "missing attribute 'establishment_id' for Product" }]
+            end
+
+            it "returns products" do
+              expect(products_controller.index[:body]).to eq(expected_result.as_json)
+            end
+
+            it "returns ok status" do
+              expect(products_controller.index[:status]).to eq(:bad_request)
+            end
+          end
+        end
+
+        context "with attachment_fields_select" do
+          context "when have nested_fields not allowed to select" do
+            let(:query_parameters) do
+              {
+                attachment_fields_select: "file"
+              }
+            end
+
+            let(:expected_result) do
+              [{ body: ["file"], message: "Selected not allowed attachment fields" }]
             end
 
             it "returns products" do
@@ -1896,7 +1929,7 @@ RSpec.describe "RestmeController", type: :controller do
               end
 
               let(:expected_result) do
-                [{ body: "products.id", message: "missing attribute 'establishment_id' for Product" }]
+                [{ body: ["id"], message: "missing attribute 'establishment_id' for Product" }]
               end
 
               it "returns products" do

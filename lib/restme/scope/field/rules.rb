@@ -38,21 +38,23 @@ module Restme
         end
 
         def select_selected_fields
-          @select_selected_fields ||= begin
-            fields = defined_fields_select | fields_select.split(",")
-
-            fields.map { |field| "#{klass.table_name}.#{field}" }.join(",")
-          end
+          @select_selected_fields ||= defined_fields_select | fields_select.split(",").map(&:to_s)
         end
 
         def model_attributes
-          @model_attributes ||= klass.attribute_names
+          @model_attributes ||= klass.attribute_names - unallowed_model_fields_select
         end
 
         def defined_fields_select
           return [] unless field_class_rules&.const_defined?(:MODEL_FIELDS_SELECT)
 
-          field_class_rules::MODEL_FIELDS_SELECT || []
+          (field_class_rules::MODEL_FIELDS_SELECT || []).map(&:to_s)
+        end
+
+        def unallowed_model_fields_select
+          return [] unless field_class_rules&.const_defined?(:UNALLOWED_MODEL_FIELDS_SELECT)
+
+          (field_class_rules::UNALLOWED_MODEL_FIELDS_SELECT || []).map(&:to_s)
         end
 
         def valid_nested_fields_select

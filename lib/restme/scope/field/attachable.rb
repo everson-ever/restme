@@ -25,10 +25,13 @@ module Restme
 
         def define_attachment_methods
           attachment_fields_select.each do |attachment_field_name|
-            klass.class_eval do
-              define_method(:"#{attachment_field_name}_url") do
-                send(attachment_field_name).url
-              end
+            method_name = "#{attachment_field_name}_url"
+
+            next if klass.method_defined?(method_name)
+
+            klass.define_method(method_name) do
+              attachment = public_send(attachment_field_name)
+              attachment&.url
             end
           end
         end
@@ -50,10 +53,9 @@ module Restme
         def unallowed_attachment_fields_error
           return if unallowed_attachment_fields.blank?
 
-          render json: {
-            body: unallowed_attachment_fields,
-            message: "Selected not allowed attachment fields"
-          }, status: :bad_request
+          restme_scope_errors({ body: unallowed_attachment_fields, message: "Selected not allowed attachment fields" })
+
+          restme_scope_status(:bad_request)
         end
 
         def unallowed_attachment_fields
