@@ -239,6 +239,8 @@ module ProductsController::Field
    # These fields are always included in the response.
    MODEL_FIELDS_SELECT = %i[id].freeze
 
+   UNALLOWED_MODEL_FIELDS_SELECT = %i[internal_code].freeze
+
     NESTED_SELECTABLE_FIELDS = {
       unit: {},
       establishment: {},
@@ -336,13 +338,6 @@ Example:
 
 ```bash
 http://localhost:3000/api/v1/products?fields_select=id,name
-```
-
-If you need to prevent a specific field from being returned in the response — even when it is selected — simply override the as_json method in the corresponding model:
-```ruby
-def as_json(options = {})
-  super({ except: [:name] }.merge(options))
-end
 ```
 
 <br><br>
