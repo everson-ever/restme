@@ -340,13 +340,6 @@ Example:
 http://localhost:3000/api/v1/products?fields_select=id,name
 ```
 
-If you need to prevent a specific field from being returned in the response — even when it is selected — simply override the as_json method in the corresponding model:
-```ruby
-def as_json(options = {})
-  super({ except: [:name] }.merge(options))
-end
-```
-
 <br><br>
 
 
