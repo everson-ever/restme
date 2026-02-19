@@ -16,7 +16,7 @@ This gem manages your controller's responsibilities for:
 
 GEMFILE:
 ```bash
-gem 'restme', '~> 1.3.0'
+gem 'restme', '~> 1.3.2'
 ```
 
 INSTALL:
